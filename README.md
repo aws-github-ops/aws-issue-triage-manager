@@ -61,7 +61,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: peterwoodworth/issue-action@main
+      - uses: aws-github-ops/aws-issue-triage-manager@main
         with:
           parameters: '[ {"area":"s3", "keywords": ["s3", "bucket"], "labels": ["s3"], "assignees": ["s3Dev"]}, {"area": "ec2", "keywords": ["ec2", "instance"], "labels": ["ec2"], "assignees": ["ec2Dev"]}]'
           github-token: "${{ secrets.GITHUB_TOKEN }}"
