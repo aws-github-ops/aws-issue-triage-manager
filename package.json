@@ -17,7 +17,7 @@
   "contributors": [
     {"name":"Peter Woodworth","url":"https://github.com/peterwoodworth"},
     {"name":"Noah Litov","url":"https://github.com/NGL321"},
-    {"name":"Jesse Katsumata","email":"jesse.katsumata@gmail.com"}
+    {"name":"Jesse Katsumata","email":"jesse.katsumata@gmail.com","url":"https://github.com/Naturalclar"}
   ],
   "license": "Apache-2.0",
   "dependencies": {
