@@ -1,4 +1,4 @@
-## AWS Issue Triage Manager
+# AWS Issue Triage Manager
 
 Github action for automatically adding labels and/or setting assignees when an Issue or PR is opened or edited based on user-defined _Area_
 
