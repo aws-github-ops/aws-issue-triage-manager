@@ -1,0 +1,36 @@
+name: "Issue Auto Labeling and Assigning"
+description: "trigger an action based on issue content"
+inputs:
+  github-token:
+    description: "Github token"
+    required: true
+  parameters:
+    description: "JSON array of keywords to look for and labels and assignees to be set when there's a keyword match"
+    required: true
+  excluded-expressions:
+    description: "Words to exclude from search"
+    required: true
+  similarity:
+    description: "Determines how similar two words can be for similarity to be detected"
+    required: false
+    default: ".125"
+  body-value:
+    description: "How much each keyword in issue body is weighted"
+    required: false
+    default: ".025"
+
+outputs:
+  title:
+    description: "Title of Issue"
+  body:
+    description: "Body of Issue"
+  labeled:
+    description: "\"true\" if labeled otherwise \"false\""
+  assigned:
+    description: "\"true\" if assigned otherwise \"false\""
+runs:
+  using: "node12"
+  main: "lib/index.js"
+branding:
+  icon: alert-circle
+  color: gray-dark
