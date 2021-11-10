@@ -1,0 +1,27 @@
+{
+  "name": "aws-issue-triage-manager",
+  "version": "1.0.0",
+  "description": "Github Action built for automatically adding labels and assignees to issues and PRs",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "ncc build src/index.ts -o lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aws-github-ops/aws-issue-triage-manager.git"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^2.2.0",
+    "js-levenshtein": "^1.1.6"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.31.1",
+    "typescript": "^4.4.4"
+  }
+}
