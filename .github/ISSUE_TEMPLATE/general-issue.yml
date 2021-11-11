@@ -1,0 +1,23 @@
+name: General Issue
+description: Create a new issue
+labels: [needs-triage, guidance]
+body:
+  - type: markdown
+
+  - type: textarea
+    id: question
+    attributes:
+      label: The Question
+      description: |
+        Ask your question here. Include any details relevant. Make sure you are not falling prey to the [X/Y problem](http://xyproblem.info)!
+    validations:
+      required: true
+
+  - type: textarea
+    id: other
+    attributes:
+      label: Other Info
+      description: |
+        Add any additional information about the issue
+    validations:
+      required: false
