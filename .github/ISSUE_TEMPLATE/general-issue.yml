@@ -2,8 +2,6 @@ name: General Issue
 description: Create a new issue
 labels: [needs-triage, guidance]
 body:
-  - type: markdown
-
   - type: textarea
     id: question
     attributes:
