@@ -66,7 +66,7 @@ export class Issue {
       });
     }    
 
-    if(potentialAreas) console.log("Area scores: ", ...potentialAreas);
+    if(potentialAreas.size === 0) console.log("Area scores: ", ...potentialAreas);
 
     const winningArea = this.decideWinner(potentialAreas);
     if(winningArea) console.log("Winning area: " + winningArea);
