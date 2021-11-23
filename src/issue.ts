@@ -15,7 +15,7 @@ export class Issue {
   private titleIssueWords?: string[];
   private bodyIssueWords?: string[];
   public parameters: IParameter[];
-  public defaultArea: IDefaultArea;
+  public defaultArea?: IDefaultArea;
   private similarity: number;
   private bodyValue: number;
 
@@ -36,7 +36,7 @@ export class Issue {
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
     }
     this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
-    this.defaultArea = JSON.parse(core.getInput("default-area", {required: true}));
+    this.defaultArea = JSON.parse(core.getInput("default-area", {required: false}));
     this.similarity = +core.getInput("similarity", {required: false});
     this.bodyValue = +core.getInput("body-value", {required: false});
   }
@@ -64,12 +64,12 @@ export class Issue {
       this.bodyIssueWords.forEach(content => {
         potentialAreas = this.scoreArea(content, potentialAreas, this.bodyValue);
       });
-    }
-      
-    console.log("Area scores: ", ...potentialAreas);
+    }    
+
+    if(potentialAreas) console.log("Area scores: ", ...potentialAreas);
 
     const winningArea = this.decideWinner(potentialAreas);
-    console.log("Winning area: " + winningArea);
+    if(winningArea) console.log("Winning area: " + winningArea);
       
     return winningArea;
   }
