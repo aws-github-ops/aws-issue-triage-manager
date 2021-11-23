@@ -32,7 +32,16 @@ Parameters should take the form
 ]
 ```
 
-### excluded expressions
+### default-area
+If no keywords to any areas are detected in your issue, set these default labels and assignees
+```
+{
+  "labels": ["labels"],
+  "assignees": ["assignees"]
+}
+```
+
+### excluded-expressions
 
 You can exclude certain expressions from being potentially counted as keywords. This is useful if you have issue templates which may contain keywords.
 The input should be an array with expressions to exclude separated by bars. Ex. `[ Expression 1 | Expression 2 ]`
