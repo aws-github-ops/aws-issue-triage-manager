@@ -4,8 +4,8 @@ import levenshtein from 'js-levenshtein';
 export interface IParameter {
   area: string;
   keywords: string[];
-  labels: string[];
-  assignees: string[];
+  labels?: string[];
+  assignees?: string[];
 }
 
 export class Issue {
