@@ -7,6 +7,9 @@ inputs:
   parameters:
     description: "JSON array of keywords to look for and labels and assignees to be set when there's a keyword match"
     required: true
+  default-area:
+    description: "Labels and assignees to apply when no keywords are detected"
+    required: false
   excluded-expressions:
     description: "Words to exclude from search"
     required: true
