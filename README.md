@@ -33,7 +33,7 @@ Parameters should take the form
 ```
 
 ### default-area
-If no keywords to any areas are detected in your issue, set these default labels and assignees
+If no keywords are detected in your issue, set these default labels and assignees
 ```
 {
   "labels": ["labels"],
