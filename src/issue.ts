@@ -15,6 +15,7 @@ export class Issue {
   private titleIssueWords?: string[];
   private bodyIssueWords?: string[];
   public parameters: IParameter[];
+  public defaultArea?: IDefaultArea;
   private similarity: number;
   private bodyValue: number;
 
@@ -35,6 +36,7 @@ export class Issue {
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
     }
     this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
+    this.defaultArea = JSON.parse(core.getInput("default-area", {required: false}));
     this.similarity = +core.getInput("similarity", {required: false});
     this.bodyValue = +core.getInput("body-value", {required: false});
   }
@@ -62,33 +64,12 @@ export class Issue {
       this.bodyIssueWords.forEach(content => {
         potentialAreas = this.scoreArea(content, potentialAreas, this.bodyValue);
       });
-    }
-      
-    console.log("Area scores: ", ...potentialAreas);
+    }    
 
-    let winningArea = '';
-    let winners: Map<string,number> = new Map();
-    for (let area of potentialAreas.entries()) {
-      if(winners.size === 0) {
-        winners.set(area[0], area[1]);
-      } else if (area[1] > winners.values().next().value) {
-        winners = new Map();
-        winners.set(area[0], area[1]);
-      } else if (area[1] === winners.values().next().value) {
-        winners.set(area[0], area[1]);
-      }
-    }
-    // tiebreaker goes to the area with more *exact* keyword matches
-    if(winners.size > 1 && this.similarity !== 0) {
-      this.similarity = 0;
-      winningArea = this.determineArea();
-    } else if (winners.size > 0) {
-      winningArea = winners.keys().next().value;
-    } 
-      
-    winningArea = winners.keys().next().value;
+    if(potentialAreas.size > 0) console.log("Area scores: ", ...potentialAreas);
 
-    console.log("Winning area: " + winningArea);
+    const winningArea = this.decideWinner(potentialAreas);
+    if(winningArea) console.log("Winning area: " + winningArea);
       
     return winningArea;
   }
@@ -121,6 +102,29 @@ export class Issue {
       })
     })    
     return potentialAreas;
+  }
+
+  private decideWinner(potentialAreas: Map<string, number>): string {
+    let winningArea = '';
+    let winners: Map<string,number> = new Map();
+    for (let area of potentialAreas.entries()) {
+      if(winners.size === 0) {
+        winners.set(area[0], area[1]);
+      } else if (area[1] > winners.values().next().value) {
+        winners = new Map();
+        winners.set(area[0], area[1]);
+      } else if (area[1] === winners.values().next().value) {
+        winners.set(area[0], area[1]);
+      }
+    }
+    // tiebreaker goes to the area with more *exact* keyword matches
+    if(winners.size > 1 && this.similarity !== 0) {
+      this.similarity = 0;
+      winningArea = this.determineArea();
+    } else if (winners.size > 0) {
+      winningArea = winners.keys().next().value;
+    } 
+    return winningArea;
   }
 
   private isSimilar(str1: string, str2: string): number {

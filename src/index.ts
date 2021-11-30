@@ -14,6 +14,10 @@ async function run() {
 
   if (winningAreaData.area === '') { 
     console.log("Keywords not included in this issue");
+    if(issue.defaultArea) {
+      if(issue.defaultArea.assignees) github.setIssueAssignees(issue.defaultArea.assignees);
+      if(issue.defaultArea.labels) github.setIssueLabels(issue.defaultArea.labels);   
+    }
   } else {
     if(winningAreaData.assignees) github.setIssueAssignees(winningAreaData.assignees);
     if(winningAreaData.labels) github.setIssueLabels(winningAreaData.labels);
