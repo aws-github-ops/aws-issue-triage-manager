@@ -26,6 +26,7 @@ export class GithubApi {
   }
 
   public async setIssueAssignees(assignees: string[]) {
+    if(!assignees.length) return;
     await this.octokit.issues.addAssignees({
       ...this.repo,
       issue_number: this.issueNumber,
@@ -34,6 +35,7 @@ export class GithubApi {
   }
 
   public async setIssueLabels(labels: string[]) {
+    if(!labels.length) return;
     await this.octokit.issues.addLabels({
       ...this.repo,
       issue_number: this.issueNumber,

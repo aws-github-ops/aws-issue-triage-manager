@@ -1,11 +1,14 @@
 import * as core from "@actions/core";
 import levenshtein from 'js-levenshtein';
 
-export interface IParameter {
+export interface IParameter extends IDefaultArea {
   area: string;
   keywords: string[];
-  labels: string[];
-  assignees: string[];
+}
+
+export interface IDefaultArea {
+  labels?: string[];
+  assignees?: string[];
 }
 
 export class Issue {
