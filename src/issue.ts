@@ -7,8 +7,8 @@ export interface IParameter extends IDefaultArea {
 }
 
 export interface IDefaultArea {
-  labels: string[];
-  assignees: string[];
+  labels?: string[];
+  assignees?: string[];
 }
 
 export class Issue {

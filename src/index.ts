@@ -15,12 +15,12 @@ async function run() {
   if (winningAreaData.area === '') { 
     console.log("Keywords not included in this issue");
     if(issue.defaultArea) {
-      github.setIssueAssignees(issue.defaultArea.assignees);
-      github.setIssueLabels(issue.defaultArea.labels);   
+      if(issue.defaultArea.assignees) github.setIssueAssignees(issue.defaultArea.assignees);
+      if(issue.defaultArea.labels) github.setIssueLabels(issue.defaultArea.labels);   
     }
   } else {
-    github.setIssueAssignees(winningAreaData.assignees);
-    github.setIssueLabels(winningAreaData.labels);
+    if(winningAreaData.assignees) github.setIssueAssignees(winningAreaData.assignees);
+    if(winningAreaData.labels) github.setIssueLabels(winningAreaData.labels);
     core.setOutput("labeled", true.toString());
     core.setOutput("assigned", true.toString());
   }
