@@ -36,7 +36,10 @@ export class Issue {
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
     }
     this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
-    this.defaultArea = JSON.parse(core.getInput("default-area", {required: false}));
+    const defaultAreaInput = core.getInput("default-area", {required: false});
+    if (defaultAreaInput) {
+      this.defaultArea = JSON.parse(defaultAreaInput);
+    }
     this.similarity = +core.getInput("similarity", {required: false});
     this.bodyValue = +core.getInput("body-value", {required: false});
   }
