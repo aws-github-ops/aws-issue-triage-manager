@@ -101,6 +101,11 @@ jobs:
           excluded-expressions: "[ TypeScript | Java | Python ]"
 ```
 
+
+## Contributing
+
+We welcome community contributions and pull requests. See [CONTRIBUTING.md](./CONTRIBUTING.md) for information on how to contribute to this project
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
