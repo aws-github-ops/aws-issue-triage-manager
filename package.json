@@ -14,7 +14,7 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.ts",
-      "src/**/*.test.ts",
+      "!src/**/*.test.ts",
       "!**/node_modules/**"
     ],
     "coverageThreshold": {
