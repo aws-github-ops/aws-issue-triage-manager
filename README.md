@@ -17,10 +17,34 @@ The value of words in the body of the issue are worth a constant value which can
 
 Keywords don't have to be an _exact_ match for the word to count. You can allow for slight amount of user error by tuning the `similarity` input. A value of 0 means that keywords have to be an exact match
 
+## Quick Start
+
+1. Install dependencies with NPM
+
+```sh
+npm install
+```
+
+2. Build the JS files
+
+```sh
+npm run build
+```
+
+## Tests
+
+Run all unit tests using Jest.
+
+```sh
+npm run test
+```
+
+_Append `-- --watch` to auto run tests when changes are saved._
+
 ## Inputs
 
 ### parameters
-Parameters should take the form 
+Parameters should take the form
 ```json
 [
   {
@@ -34,7 +58,7 @@ Parameters should take the form
 
 ### default-area
 If no keywords are detected in your issue, set these default labels and assignees
-```
+```json
 {
   "labels": ["labels"],
   "assignees": ["assignees"]
