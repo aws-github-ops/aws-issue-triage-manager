@@ -244,3 +244,19 @@ test('similarStrings() returns false, when provided two completely different str
 
   expect(winningArea).toStrictEqual(false);
 });
+
+test('areaIsKeyword parameter uses area as keyword', () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([{
+    area: '@aws-cdk/aws-cognito',
+    keywords: ['nokeywords'],
+    labels: ["a", "b", "c"],
+    assignees: ["d", "e", "f"],
+  }]);
+  process.env['INPUT_AREA-IS-KEYWORD'] = 'true';
+  const content = ['(@aws-cdk/aws-cognito): This is a title', '(This) is a body'];
+  const issue = new Issue(content);
+  
+  const area = issue.determineArea();
+
+  expect(area).toStrictEqual('@aws-cdk/aws-cognito');
+});
