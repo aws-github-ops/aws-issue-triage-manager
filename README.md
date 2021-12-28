@@ -65,6 +65,9 @@ If no keywords are detected in your issue, set these default labels and assignee
 }
 ```
 
+### area-is-keyword
+Setting this to `true` will consider the title of the area to be a keyword of that area
+
 ### excluded-expressions
 
 You can exclude certain expressions from being potentially counted as keywords. This is useful if you have issue templates which may contain keywords.

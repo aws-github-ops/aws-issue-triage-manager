@@ -18,6 +18,7 @@ export class Issue {
   public defaultArea?: IDefaultArea;
   private similarity: number;
   private bodyValue: number;
+  private areaIsKeyword: boolean;
 
   constructor(content: string[]) {
     const excluded: string[] = core.getInput("excluded-expressions", {required: false}).replace(/\[|\]/gi, '').split('|');
@@ -36,6 +37,8 @@ export class Issue {
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
     }
     this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
+    const areaIsKeywordInput: string = core.getInput("area-is-keyword", {required: false});
+    areaIsKeywordInput.toLowerCase() === 'true' ? this.areaIsKeyword = true : this.areaIsKeyword = false;
     const defaultAreaInput = core.getInput("default-area", {required: false});
     if (defaultAreaInput) {
       this.defaultArea = JSON.parse(defaultAreaInput);
@@ -96,6 +99,13 @@ export class Issue {
 
   private scoreArea(content: string, potentialAreas: Map<string, number>, value): Map<string, number> {
     this.parameters.forEach(obj => {
+      if(this.areaIsKeyword) {
+        if(this.similarStrings(content, obj.area)) {
+          potentialAreas.has(obj.area) ?
+            potentialAreas.set(obj.area, potentialAreas.get(obj.area)+value) :
+            potentialAreas.set(obj.area, value);
+        }
+      }
       obj.keywords.forEach(keyword => {
         if(this.similarStrings(content, keyword)) {
           potentialAreas.has(obj.area) ?
