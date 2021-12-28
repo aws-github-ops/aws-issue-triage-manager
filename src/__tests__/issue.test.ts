@@ -252,12 +252,10 @@ test('areaIsKeyword parameter uses area as keyword', () => {
     labels: ["a", "b", "c"],
     assignees: ["d", "e", "f"],
   }]);
-
   process.env['INPUT_AREA-IS-KEYWORD'] = 'true';
-
   const content = ['(@aws-cdk/aws-cognito): This is a title', '(This) is a body'];
-
   const issue = new Issue(content);
+  
   const area = issue.determineArea();
 
   expect(area).toStrictEqual('@aws-cdk/aws-cognito');
