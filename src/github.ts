@@ -65,8 +65,12 @@ export class GithubApi {
 
     for (let label of data.labels) {
       if (includedLabels) {
-        if (includedLabels.includes(label.name)) containsIncludedLabel = true;
+        if (includedLabels.includes(label.name.toString())) containsIncludedLabel = true;
+      } else {
+        containsIncludedLabel = true;
       }
+
+      console.log(containsIncludedLabel)
 
       if (excludedLabels) {
         if (excludedLabels.includes(label.name)) {
