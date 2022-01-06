@@ -14,6 +14,12 @@ inputs:
   default-area:
     description: "Labels and assignees to apply when no keywords are detected"
     required: false
+  included-labels:
+    description: "Only issues which include one of these labels will be triaged"
+    required: false
+  excluded-labels:
+    description: "Issues which include any of these labels will not be triaged"
+    required: false
   excluded-expressions:
     description: "Words to exclude from search"
     required: false
