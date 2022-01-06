@@ -64,11 +64,14 @@ export class GithubApi {
     let containsExcludedLabel = false;
 
     for (let label of data.labels) {
+      console.log("Label on issue", label)
       if (includedLabels) {
+        console.log("IncludedLabels", includedLabels);
         if (includedLabels.includes(label.name)) containsIncludedLabel = true;
       }
 
       if (excludedLabels) {
+        console.log("ExcludedLabels", excludedLabels)
         if (excludedLabels.includes(label.name)) containsExcludedLabel = true;
       }
     }
