@@ -11,7 +11,10 @@ async function run() {
   const content: string[] = await github.getIssueContent();
   const includedLabels: string[] | undefined = core.getInput('included-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
   const excludedLabels: string[] | undefined = core.getInput('excluded-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
-  if (await github.verifyIssueLabels(includedLabels, excludedLabels)) return;
+  if (!await github.verifyIssueLabels(includedLabels, excludedLabels)) {
+    console.log("Issue failed label validation. Exiting successfully")
+    return;
+  }
 
   const issue: Issue = new Issue(content);
   const winningAreaData: IParameter = issue.getWinningAreaData(issue.determineArea())
@@ -23,8 +26,8 @@ async function run() {
       if (issue.defaultArea.labels) github.setIssueLabels(issue.defaultArea.labels);   
     }
   } else {
-    if(winningAreaData.assignees) github.setIssueAssignees(winningAreaData.assignees);
-    if(winningAreaData.labels) github.setIssueLabels(winningAreaData.labels);
+    if (winningAreaData.assignees) github.setIssueAssignees(winningAreaData.assignees);
+    if (winningAreaData.labels) github.setIssueLabels(winningAreaData.labels);
     core.setOutput("labeled", true.toString());
     core.setOutput("assigned", true.toString());
   }

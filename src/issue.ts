@@ -57,7 +57,7 @@ export class Issue {
     }
       
     // For each word in the title, check if it matches any keywords. If it does, add decreasing score based on inverse function to the area keyword is in.
-    if(this.titleIssueWords) {
+    if (this.titleIssueWords) {
       this.titleIssueWords.forEach(content => {
         potentialAreas = this.scoreArea(content, potentialAreas, titleValue);
         ++x;
@@ -66,16 +66,16 @@ export class Issue {
     }
       
     // Add static value to area keyword is in if keyword is found in body
-    if(this.bodyIssueWords) {
+    if (this.bodyIssueWords) {
       this.bodyIssueWords.forEach(content => {
         potentialAreas = this.scoreArea(content, potentialAreas, this.bodyValue);
       });
     }    
 
-    if(potentialAreas.size > 0) console.log("Area scores: ", ...potentialAreas);
+    if (potentialAreas.size > 0) console.log("Area scores: ", ...potentialAreas);
 
     const winningArea = this.decideWinner(potentialAreas);
-    if(winningArea) console.log("Winning area: " + winningArea);
+    if (winningArea) console.log("Winning area: " + winningArea);
       
     return winningArea;
   }
@@ -88,8 +88,8 @@ export class Issue {
       assignees: [],
     }
 
-    for(let obj of this.parameters) {
-      if(winningArea === obj.area) {
+    for (let obj of this.parameters) {
+      if (winningArea === obj.area) {
         winningAreaData = obj;
       }
     }
@@ -99,15 +99,15 @@ export class Issue {
 
   private scoreArea(content: string, potentialAreas: Map<string, number>, value): Map<string, number> {
     this.parameters.forEach(obj => {
-      if(this.areaIsKeyword) {
-        if(this.similarStrings(content, obj.area)) {
+      if (this.areaIsKeyword) {
+        if (this.similarStrings(content, obj.area)) {
           potentialAreas.has(obj.area) ?
             potentialAreas.set(obj.area, potentialAreas.get(obj.area)+value) :
             potentialAreas.set(obj.area, value);
         }
       }
       obj.keywords.forEach(keyword => {
-        if(this.similarStrings(content, keyword)) {
+        if (this.similarStrings(content, keyword)) {
           potentialAreas.has(obj.area) ?
             potentialAreas.set(obj.area, potentialAreas.get(obj.area)+value) :
             potentialAreas.set(obj.area, value);
@@ -121,7 +121,7 @@ export class Issue {
     let winningArea = '';
     let winners: Map<string,number> = new Map();
     for (let area of potentialAreas.entries()) {
-      if(winners.size === 0) {
+      if (winners.size === 0) {
         winners.set(area[0], area[1]);
       } else if (area[1] > winners.values().next().value) {
         winners = new Map();
@@ -131,7 +131,7 @@ export class Issue {
       }
     }
     // tiebreaker goes to the area with more *exact* keyword matches
-    if(winners.size > 1 && this.similarity !== 0) {
+    if (winners.size > 1 && this.similarity !== 0) {
       this.similarity = 0;
       winningArea = this.determineArea();
     } else if (winners.size > 0) {
@@ -155,7 +155,7 @@ export class Issue {
     // levenshtein returns a value between 0 and the length of the strings being compared. This
     // represents the number of character differences between compared strings. We compare this
     // with a set percentage of the average length of said strings
-    if(levenshtein(str1, str2) <= this.isSimilar(str1, str2))
+    if (levenshtein(str1, str2) <= this.isSimilar(str1, str2))
       return true;
     else
       return false;

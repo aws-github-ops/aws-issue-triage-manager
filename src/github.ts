@@ -64,19 +64,21 @@ export class GithubApi {
     let containsExcludedLabel = false;
 
     for (let label of data.labels) {
-      console.log("Label on issue", label)
       if (includedLabels) {
-        console.log("IncludedLabels", includedLabels, label.name);
         if (includedLabels.includes(label.name)) containsIncludedLabel = true;
       }
 
       if (excludedLabels) {
-        console.log("ExcludedLabels", excludedLabels, label.name)
-        if (excludedLabels.includes(label.name)) containsExcludedLabel = true;
+        if (excludedLabels.includes(label.name)) {
+          containsExcludedLabel = true;
+          console.log(`This issue contains the excluded label ${label.name}`);
+        }
       }
     }
 
-    console.log(containsExcludedLabel, " << Excluded << || >> Included >> ", containsIncludedLabel)
+    if (!containsIncludedLabel) {
+      console.log('This issue contains no required labels');
+    }
 
     if (!containsIncludedLabel || containsExcludedLabel) {
       return false;
