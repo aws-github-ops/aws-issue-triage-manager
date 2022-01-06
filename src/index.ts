@@ -11,8 +11,7 @@ async function run() {
   const content: string[] = await github.getIssueContent();
   const includedLabels: string[] | undefined = core.getInput('included-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
   const excludedLabels: string[] | undefined = core.getInput('excluded-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
-  if (includedLabels || excludedLabels) {
-    console.log(includedLabels, excludedLabels);
+  if (includedLabels[0] || excludedLabels[0]) {
     if (!await github.verifyIssueLabels(includedLabels, excludedLabels)) {
       console.log("Issue failed label validation. Exiting successfully")
       return;
