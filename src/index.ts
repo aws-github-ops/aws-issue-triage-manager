@@ -13,13 +13,13 @@ async function run() {
   const excludedLabels: string[] | undefined = core.getInput('excluded-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
   if (includedLabels[0] || excludedLabels[0]) {
     if (!await github.verifyIssueLabels(includedLabels, excludedLabels)) {
-      console.log("Issue failed label validation. Exiting successfully")
+      console.log("Issue failed label validation. Exiting successfully");
       return;
     }
   }
 
   const issue: Issue = new Issue(content);
-  const winningAreaData: IParameter = issue.getWinningAreaData(issue.determineArea())
+  const winningAreaData: IParameter = issue.getWinningAreaData(issue.determineArea());
 
   if (winningAreaData.area === '') { 
     console.log("Keywords not included in this issue");

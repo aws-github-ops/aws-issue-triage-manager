@@ -1,5 +1,5 @@
 import * as github from "@actions/github";
-import * as core from '@actions/core'
+import * as core from '@actions/core';
 
 export interface IRepo {
   owner: string;
@@ -29,7 +29,7 @@ export class GithubApi {
     await this.octokit.issues.addAssignees({
       ...this.repo,
       issue_number: this.issueNumber,
-      assignees
+      assignees,
     });
   }
 
@@ -38,7 +38,7 @@ export class GithubApi {
     await this.octokit.issues.addLabels({
       ...this.repo,
       issue_number: this.issueNumber,
-      labels
+      labels,
     });
   }
 
@@ -69,8 +69,6 @@ export class GithubApi {
       } else {
         containsIncludedLabel = true;
       }
-
-      console.log(containsIncludedLabel)
 
       if (excludedLabels) {
         if (excludedLabels.includes(label.name)) {
