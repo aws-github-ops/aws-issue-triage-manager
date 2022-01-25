@@ -83,6 +83,16 @@ A set constant for how much each keyword detected in the body of the issue is wo
 
 The default value is **.025**
 
+### included-labels
+Conditionally run this action based on the labels present on the issue. Will only run on issues with the specified labels
+
+If no input is provided, the action will always run
+
+### excluded-labels
+Conditionally run this action based on the labels present on the issue. Will not run on issues with the specified labels
+
+Overrides `included-labels`
+
 ## Example
 
 ```yaml

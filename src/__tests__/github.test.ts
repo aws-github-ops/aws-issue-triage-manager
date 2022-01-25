@@ -1,9 +1,9 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import { GithubApi } from '../github';
+import {GithubApi} from '../github';
 
 // Shallow clone original @actions/github context
-const originalContext = { ...github.context };
+const originalContext = {...github.context};
 
 beforeEach(() => {
   process.env.GITHUB_REPOSITORY = 'aws/test';
@@ -133,6 +133,11 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
     data: {
       title: 'test-title',
       body: 'test-body',
+      labels: [
+        {
+          name: 'needs-triage',
+        },
+      ],
     },
   });
 
@@ -142,5 +147,9 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
   expect(githubApi['octokit'].issues.get).toHaveBeenCalledWith({
     issue_number: 54321,
   });
-  expect(content).toStrictEqual(['test-title', 'test-body']);
+  expect(content).toStrictEqual({
+    title: 'test-title',
+    body: 'test-body',
+    labels: ['needs-triage'],
+  });
 });
