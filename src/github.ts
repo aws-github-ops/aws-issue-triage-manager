@@ -1,6 +1,6 @@
-import * as github from "@actions/github";
+import * as github from '@actions/github';
 import * as core from '@actions/core';
-import { IIssueData } from "./issue";
+import {IIssueData} from './issue';
 
 export interface IRepo {
   owner: string;
@@ -16,12 +16,12 @@ export class GithubApi {
     this.octokit = new github.GitHub(token);
     this.repo = github.context.repo;
 
-    if (github.context.payload.issue) { 
+    if (github.context.payload.issue) {
       this.issueNumber = github.context.payload.issue.number;
-    } else if (github.context.payload.pull_request) { 
+    } else if (github.context.payload.pull_request) {
       this.issueNumber = github.context.payload.pull_request.number;
     } else {
-      core.setFailed(`Error retrieving issue number`);
+      core.setFailed('Error retrieving issue number');
     }
   }
 
@@ -43,18 +43,18 @@ export class GithubApi {
     });
   }
 
-  public async getIssueContent(): Promise<IIssueData> { 
-    const { data } = await this.octokit.issues.get({
+  public async getIssueContent(): Promise<IIssueData> {
+    const {data} = await this.octokit.issues.get({
       ...this.repo,
       issue_number: this.issueNumber,
     });
 
-    let title: string = data.title;
-    let body: string = data.body;
-    let labels: string[] = [];
+    const title: string = data.title;
+    const body: string = data.body;
+    const labels: string[] = [];
 
-    for(let label of data.labels) {
-      labels.push(label.name.toString())
+    for (const label of data.labels) {
+      labels.push(label.name.toString());
     }
 
     return {
@@ -62,5 +62,5 @@ export class GithubApi {
       body,
       labels,
     };
-  };
+  }
 }

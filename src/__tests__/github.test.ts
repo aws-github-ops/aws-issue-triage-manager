@@ -1,9 +1,9 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import { GithubApi } from '../github';
+import {GithubApi} from '../github';
 
 // Shallow clone original @actions/github context
-const originalContext = { ...github.context };
+const originalContext = {...github.context};
 
 beforeEach(() => {
   process.env.GITHUB_REPOSITORY = 'aws/test';
@@ -135,9 +135,9 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
       body: 'test-body',
       labels: [
         {
-          name: 'needs-triage'
-        }
-      ]
+          name: 'needs-triage',
+        },
+      ],
     },
   });
 
