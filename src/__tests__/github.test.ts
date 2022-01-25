@@ -133,6 +133,11 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
     data: {
       title: 'test-title',
       body: 'test-body',
+      labels: [
+        {
+          name: 'needs-triage'
+        }
+      ]
     },
   });
 
@@ -142,5 +147,9 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
   expect(githubApi['octokit'].issues.get).toHaveBeenCalledWith({
     issue_number: 54321,
   });
-  expect(content).toStrictEqual(['test-title', 'test-body']);
+  expect(content).toStrictEqual({
+    title: 'test-title',
+    body: 'test-body',
+    labels: ['needs-triage'],
+  });
 });

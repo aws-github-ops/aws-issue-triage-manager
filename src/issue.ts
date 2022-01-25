@@ -1,6 +1,12 @@
 import * as core from "@actions/core";
 import levenshtein from 'js-levenshtein';
 
+export interface IIssueData {
+  title?: string;
+  body?: string;
+  labels?: string[];
+}
+
 export interface IParameter extends IDefaultArea {
   area: string;
   keywords: string[];
@@ -19,32 +25,73 @@ export class Issue {
   private similarity: number;
   private bodyValue: number;
   private areaIsKeyword: boolean;
+  private labels: string[] | undefined;
 
-  constructor(content: string[]) {
+  constructor(content: IIssueData) {
+    this.labels = content.labels;
+    this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
+    this.similarity = +core.getInput("similarity", {required: false});
+    this.bodyValue = +core.getInput("body-value", {required: false});
+
+    const areaIsKeywordInput: string = core.getInput("area-is-keyword", {required: false});
+    areaIsKeywordInput.toLowerCase() === 'true' ? this.areaIsKeyword = true : this.areaIsKeyword = false;
+
     const excluded: string[] = core.getInput("excluded-expressions", {required: false}).replace(/\[|\]/gi, '').split('|');
-    const title = content[0];
-    const body = content[1];
+
+    const title = content.title;
     if (title) {
       excluded.forEach(ex => {
         title.replace(ex, '');
       });
       this.titleIssueWords = title.split(/ |\(|\)|\./);
     }
+
+    const body = content.body;
     if (body) {
       excluded.forEach(ex => {
         body.replace(ex, '');
       });
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
     }
-    this.parameters = JSON.parse(core.getInput("parameters", {required: true}));
-    const areaIsKeywordInput: string = core.getInput("area-is-keyword", {required: false});
-    areaIsKeywordInput.toLowerCase() === 'true' ? this.areaIsKeyword = true : this.areaIsKeyword = false;
+
     const defaultAreaInput = core.getInput("default-area", {required: false});
     if (defaultAreaInput) {
       this.defaultArea = JSON.parse(defaultAreaInput);
     }
-    this.similarity = +core.getInput("similarity", {required: false});
-    this.bodyValue = +core.getInput("body-value", {required: false});
+  }
+
+  public verifyIssueLabels(includedLabels: string[], excludedLabels: string[]): boolean {
+    let containsIncludedLabel = false;
+    let containsExcludedLabel = false;
+
+    if (this.labels) {
+      for (let label of this.labels) {
+        if (includedLabels) {
+          if (includedLabels.includes(label)) containsIncludedLabel = true;
+        }
+  
+        if (excludedLabels) {
+          if (excludedLabels.includes(label)) {
+            containsExcludedLabel = true;
+            console.log(`This issue contains the excluded label ${label}`);
+          }
+        }
+      }
+    } else {
+      if (!includedLabels[0]) {
+        containsIncludedLabel = true;
+      }
+    }
+
+    if (!containsIncludedLabel) {
+      console.log('This issue contains no required labels');
+    }
+
+    if (!containsIncludedLabel || containsExcludedLabel) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public determineArea(): string {

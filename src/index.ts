@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { IParameter, Issue } from './issue';
+import { IParameter, Issue, IIssueData } from './issue';
 import { GithubApi } from './github';
 
 async function run() {
@@ -8,22 +8,24 @@ async function run() {
 
   const token = core.getInput('github-token');
   const github: GithubApi = new GithubApi(token);
-  const content: string[] = await github.getIssueContent();
+  const content: IIssueData = await github.getIssueContent();
   const includedLabels: string[] | undefined = core.getInput('included-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
   const excludedLabels: string[] | undefined = core.getInput('excluded-labels', { required: false }).replace(/\[|\]/gi, '').split('|');
+
+  const issue: Issue = new Issue(content);
+  const winningAreaData: IParameter = issue.getWinningAreaData(issue.determineArea());
+
   if (includedLabels[0] || excludedLabels[0]) {
-    if (!await github.verifyIssueLabels(includedLabels, excludedLabels)) {
+    if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
       console.log("Issue failed label validation. Exiting successfully");
       return;
     }
   }
 
-  const issue: Issue = new Issue(content);
-  const winningAreaData: IParameter = issue.getWinningAreaData(issue.determineArea());
-
   if (winningAreaData.area === '') { 
     console.log("Keywords not included in this issue");
     if (issue.defaultArea) {
+      console.log("Assigning default values to issue")
       if (issue.defaultArea.assignees) github.setIssueAssignees(issue.defaultArea.assignees);
       if (issue.defaultArea.labels) github.setIssueLabels(issue.defaultArea.labels);   
     }

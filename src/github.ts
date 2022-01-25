@@ -1,5 +1,6 @@
 import * as github from "@actions/github";
 import * as core from '@actions/core';
+import { IIssueData } from "./issue";
 
 export interface IRepo {
   owner: string;
@@ -42,50 +43,24 @@ export class GithubApi {
     });
   }
 
-  public async getIssueContent(): Promise<string[]> { 
-    let content: string[] = [];
-  
+  public async getIssueContent(): Promise<IIssueData> { 
     const { data } = await this.octokit.issues.get({
       ...this.repo,
       issue_number: this.issueNumber,
     });
-  
-    content.push(data.title, data.body);
-    return content;
+
+    let title: string = data.title;
+    let body: string = data.body;
+    let labels: string[] = [];
+
+    for(let label of data.labels) {
+      labels.push(label.name.toString())
+    }
+
+    return {
+      title,
+      body,
+      labels,
+    };
   };
-
-  public async verifyIssueLabels(includedLabels: string[] | undefined, excludedLabels: string[] | undefined): Promise<boolean> {
-    const { data } = await this.octokit.issues.get({
-      ...this.repo,
-      issue_number: this.issueNumber,
-    });
-
-    let containsIncludedLabel = false;
-    let containsExcludedLabel = false;
-
-    for (let label of data.labels) {
-      if (includedLabels) {
-        if (includedLabels.includes(label.name.toString())) containsIncludedLabel = true;
-      } else {
-        containsIncludedLabel = true;
-      }
-
-      if (excludedLabels) {
-        if (excludedLabels.includes(label.name)) {
-          containsExcludedLabel = true;
-          console.log(`This issue contains the excluded label ${label.name}`);
-        }
-      }
-    }
-
-    if (!containsIncludedLabel) {
-      console.log('This issue contains no required labels');
-    }
-
-    if (!containsIncludedLabel || containsExcludedLabel) {
-      return false;
-    } else {
-      return true;
-    }
-  }
 }
