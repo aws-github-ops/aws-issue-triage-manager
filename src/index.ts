@@ -25,15 +25,15 @@ async function run() {
 
   if (includedLabels[0] || excludedLabels[0]) {
     if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
-      console.log('Issue failed label validation. Exiting successfully');
+      core.info('Issue failed label validation. Exiting successfully');
       return;
     }
   }
 
   if (winningAreaData.area === '') {
-    console.log('Keywords not included in this issue');
+    core.info('Keywords not included in this issue');
     if (issue.defaultArea) {
-      console.log('Assigning default values to issue');
+      core.info('Assigning default values to issue');
       if (issue.defaultArea.assignees)
         github.setIssueAssignees(issue.defaultArea.assignees);
       if (issue.defaultArea.labels)

@@ -28139,14 +28139,14 @@ function run() {
         const winningAreaData = issue.getWinningAreaData(issue.determineArea());
         if (includedLabels[0] || excludedLabels[0]) {
             if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
-                console.log('Issue failed label validation. Exiting successfully');
+                core.info('Issue failed label validation. Exiting successfully');
                 return;
             }
         }
         if (winningAreaData.area === '') {
-            console.log('Keywords not included in this issue');
+            core.info('Keywords not included in this issue');
             if (issue.defaultArea) {
-                console.log('Assigning default values to issue');
+                core.info('Assigning default values to issue');
                 if (issue.defaultArea.assignees)
                     github.setIssueAssignees(issue.defaultArea.assignees);
                 if (issue.defaultArea.labels)
@@ -28249,18 +28249,16 @@ class Issue {
                 if (excludedLabels) {
                     if (excludedLabels.includes(label)) {
                         containsExcludedLabel = true;
-                        console.log(`This issue contains the excluded label ${label}`);
+                        core.info(`This issue contains the excluded label ${label}`);
                     }
                 }
             }
         }
-        else {
-            if (!includedLabels[0]) {
-                containsIncludedLabel = true;
-            }
+        if (!includedLabels[0]) {
+            containsIncludedLabel = true;
         }
         if (!containsIncludedLabel) {
-            console.log('This issue contains no required labels');
+            core.info('This issue contains no required labels');
         }
         if (!containsIncludedLabel || containsExcludedLabel) {
             return false;
@@ -28294,7 +28292,7 @@ class Issue {
             console.log('Area scores: ', ...potentialAreas);
         const winningArea = this.decideWinner(potentialAreas);
         if (winningArea)
-            console.log('Winning area: ' + winningArea);
+            core.info('Winning area: ' + winningArea);
         return winningArea;
     }
     getWinningAreaData(winningArea) {

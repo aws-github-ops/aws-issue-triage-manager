@@ -84,18 +84,18 @@ export class Issue {
         if (excludedLabels) {
           if (excludedLabels.includes(label)) {
             containsExcludedLabel = true;
-            console.log(`This issue contains the excluded label ${label}`);
+            core.info(`This issue contains the excluded label ${label}`);
           }
         }
       }
-    } else {
-      if (!includedLabels[0]) {
-        containsIncludedLabel = true;
-      }
+    }
+
+    if (!includedLabels[0]) {
+      containsIncludedLabel = true;
     }
 
     if (!containsIncludedLabel) {
-      console.log('This issue contains no required labels');
+      core.info('This issue contains no required labels');
     }
 
     if (!containsIncludedLabel || containsExcludedLabel) {
@@ -138,7 +138,7 @@ export class Issue {
       console.log('Area scores: ', ...potentialAreas);
 
     const winningArea = this.decideWinner(potentialAreas);
-    if (winningArea) console.log('Winning area: ' + winningArea);
+    if (winningArea) core.info('Winning area: ' + winningArea);
 
     return winningArea;
   }

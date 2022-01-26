@@ -443,3 +443,18 @@ test('verifyIssueLabels returns true, when no labels are present on issue and no
 
   expect(result).toStrictEqual(true);
 });
+
+test('verifyIssueLabels returns true, when no included-labels are specified and labels are present on issue', () => {
+  const title = '(@aws-cdk/aws-cognito): This is a title';
+  const body = '(This) is a body';
+  const labels = ['needs-triage'];
+  const issue = new Issue({
+    title,
+    body,
+    labels,
+  });
+
+  const result = issue.verifyIssueLabels([''], ['p2']);
+
+  expect(result).toStrictEqual(true);
+});
