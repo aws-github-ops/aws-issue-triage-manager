@@ -28241,6 +28241,7 @@ class Issue {
         let containsIncludedLabel = false;
         let containsExcludedLabel = false;
         let hasIncludedLabels = true;
+        console.log(includedLabels[0]);
         if (includedLabels[0] === '') {
             hasIncludedLabels = false;
         }
