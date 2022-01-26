@@ -74,36 +74,24 @@ export class Issue {
   ): boolean {
     let containsIncludedLabel = false;
     let containsExcludedLabel = false;
-    let hasIncludedLabels = true;
-
-    if (!includedLabels[0]) {
-      hasIncludedLabels = false;
-    }
-
-    console.log(hasIncludedLabels);
 
     if (this.labels) {
       for (const label of this.labels) {
-        if (hasIncludedLabels) {
-          console.log('HI THERE');
+        if (includedLabels) {
           if (includedLabels.includes(label)) containsIncludedLabel = true;
-        } else {
-          console.log('I"M ASSIGNING YOU TO TRUE');
-          containsIncludedLabel = true;
         }
 
-        if (excludedLabels[0]) {
+        if (excludedLabels) {
           if (excludedLabels.includes(label)) {
             containsExcludedLabel = true;
             core.info(`This issue contains the excluded label ${label}`);
           }
         }
       }
-    } else {
-      if (!hasIncludedLabels) {
-        containsIncludedLabel = true;
-        console.log('I"M ASSIGNING YOU TO TRUE');
-      }
+    }
+
+    if (!includedLabels[0]) {
+      containsIncludedLabel = true;
     }
 
     if (!containsIncludedLabel) {

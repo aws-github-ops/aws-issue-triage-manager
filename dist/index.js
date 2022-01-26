@@ -28139,14 +28139,14 @@ function run() {
         const winningAreaData = issue.getWinningAreaData(issue.determineArea());
         if (includedLabels[0] || excludedLabels[0]) {
             if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
-                console.log('Issue failed label validation. Exiting successfully');
+                core.info('Issue failed label validation. Exiting successfully');
                 return;
             }
         }
         if (winningAreaData.area === '') {
-            console.log('Keywords not included in this issue');
+            core.info('Keywords not included in this issue');
             if (issue.defaultArea) {
-                console.log('Assigning default values to issue');
+                core.info('Assigning default values to issue');
                 if (issue.defaultArea.assignees)
                     github.setIssueAssignees(issue.defaultArea.assignees);
                 if (issue.defaultArea.labels)
@@ -28240,23 +28240,13 @@ class Issue {
     verifyIssueLabels(includedLabels, excludedLabels) {
         let containsIncludedLabel = false;
         let containsExcludedLabel = false;
-        let hasIncludedLabels = true;
-        if (!includedLabels[0]) {
-            hasIncludedLabels = false;
-        }
-        console.log(hasIncludedLabels);
         if (this.labels) {
             for (const label of this.labels) {
-                if (hasIncludedLabels) {
-                    console.log('HI THERE');
+                if (includedLabels) {
                     if (includedLabels.includes(label))
                         containsIncludedLabel = true;
                 }
-                else {
-                    console.log('I"M ASSIGNING YOU TO TRUE');
-                    containsIncludedLabel = true;
-                }
-                if (excludedLabels[0]) {
+                if (excludedLabels) {
                     if (excludedLabels.includes(label)) {
                         containsExcludedLabel = true;
                         core.info(`This issue contains the excluded label ${label}`);
@@ -28264,11 +28254,8 @@ class Issue {
                 }
             }
         }
-        else {
-            if (!hasIncludedLabels) {
-                containsIncludedLabel = true;
-                console.log('I"M ASSIGNING YOU TO TRUE');
-            }
+        if (!includedLabels[0]) {
+            containsIncludedLabel = true;
         }
         if (!containsIncludedLabel) {
             core.info('This issue contains no required labels');
