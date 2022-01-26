@@ -76,17 +76,19 @@ export class Issue {
     let containsExcludedLabel = false;
     let hasIncludedLabels = true;
 
-    console.log(includedLabels[0]);
-
-    if (includedLabels[0] == '') {
+    if (!includedLabels[0]) {
       hasIncludedLabels = false;
     }
+
+    console.log(hasIncludedLabels);
 
     if (this.labels) {
       for (const label of this.labels) {
         if (hasIncludedLabels) {
+          console.log('HI THERE');
           if (includedLabels.includes(label)) containsIncludedLabel = true;
         } else {
+          console.log('I"M ASSIGNING YOU TO TRUE');
           containsIncludedLabel = true;
         }
 
@@ -100,6 +102,7 @@ export class Issue {
     } else {
       if (!hasIncludedLabels) {
         containsIncludedLabel = true;
+        console.log('I"M ASSIGNING YOU TO TRUE');
       }
     }
 
