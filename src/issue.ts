@@ -75,6 +75,14 @@ export class Issue {
     let containsIncludedLabel = false;
     let containsExcludedLabel = false;
 
+    console.log('These are the labels you want to filter');
+    console.log(includedLabels, excludedLabels);
+
+    console.log(
+      'This is the first index in the array of labels you want to filter'
+    );
+    console.log(includedLabels[0], excludedLabels[0]);
+
     if (this.labels) {
       for (const label of this.labels) {
         if (includedLabels[0]) {

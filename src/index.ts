@@ -23,17 +23,20 @@ async function run() {
     issue.determineArea()
   );
 
+  console.log('These are the labels you want to filter');
+  console.log(includedLabels, excludedLabels);
+
   if (includedLabels[0] || excludedLabels[0]) {
     if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
-      core.info('Issue failed label validation. Exiting successfully');
+      console.log('Issue failed label validation. Exiting successfully');
       return;
     }
   }
 
   if (winningAreaData.area === '') {
-    core.info('Keywords not included in this issue');
+    console.log('Keywords not included in this issue');
     if (issue.defaultArea) {
-      core.info('Assigning default values to issue');
+      console.log('Assigning default values to issue');
       if (issue.defaultArea.assignees)
         github.setIssueAssignees(issue.defaultArea.assignees);
       if (issue.defaultArea.labels)

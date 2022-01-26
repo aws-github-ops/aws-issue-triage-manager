@@ -28137,16 +28137,18 @@ function run() {
             .split('|');
         const issue = new issue_1.Issue(content);
         const winningAreaData = issue.getWinningAreaData(issue.determineArea());
+        console.log('These are the labels you want to filter');
+        console.log(includedLabels, excludedLabels);
         if (includedLabels[0] || excludedLabels[0]) {
             if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
-                core.info('Issue failed label validation. Exiting successfully');
+                console.log('Issue failed label validation. Exiting successfully');
                 return;
             }
         }
         if (winningAreaData.area === '') {
-            core.info('Keywords not included in this issue');
+            console.log('Keywords not included in this issue');
             if (issue.defaultArea) {
-                core.info('Assigning default values to issue');
+                console.log('Assigning default values to issue');
                 if (issue.defaultArea.assignees)
                     github.setIssueAssignees(issue.defaultArea.assignees);
                 if (issue.defaultArea.labels)
@@ -28240,6 +28242,10 @@ class Issue {
     verifyIssueLabels(includedLabels, excludedLabels) {
         let containsIncludedLabel = false;
         let containsExcludedLabel = false;
+        console.log('These are the labels you want to filter');
+        console.log(includedLabels, excludedLabels);
+        console.log('This is the first index in the array of labels you want to filter');
+        console.log(includedLabels[0], excludedLabels[0]);
         if (this.labels) {
             for (const label of this.labels) {
                 if (includedLabels[0]) {
