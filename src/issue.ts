@@ -74,15 +74,16 @@ export class Issue {
   ): boolean {
     let containsIncludedLabel = false;
     let containsExcludedLabel = false;
-    console.log(includedLabels);
 
     if (this.labels) {
       for (const label of this.labels) {
-        if (includedLabels) {
+        if (includedLabels[0]) {
           if (includedLabels.includes(label)) containsIncludedLabel = true;
+        } else {
+          containsIncludedLabel = true;
         }
 
-        if (excludedLabels) {
+        if (excludedLabels[0]) {
           if (excludedLabels.includes(label)) {
             containsExcludedLabel = true;
             core.info(`This issue contains the excluded label ${label}`);
