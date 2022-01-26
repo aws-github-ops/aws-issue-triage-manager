@@ -23,9 +23,6 @@ async function run() {
     issue.determineArea()
   );
 
-  console.log('These are the labels you want to filter');
-  console.log(includedLabels, excludedLabels);
-
   if (includedLabels[0] || excludedLabels[0]) {
     if (!issue.verifyIssueLabels(includedLabels, excludedLabels)) {
       console.log('Issue failed label validation. Exiting successfully');

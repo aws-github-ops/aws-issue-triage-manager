@@ -74,18 +74,15 @@ export class Issue {
   ): boolean {
     let containsIncludedLabel = false;
     let containsExcludedLabel = false;
+    let hasIncludedLabels = true;
 
-    console.log('These are the labels you want to filter');
-    console.log(includedLabels, excludedLabels);
-
-    console.log(
-      'This is the first index in the array of labels you want to filter'
-    );
-    console.log(includedLabels[0], excludedLabels[0]);
+    if (includedLabels[0] === '') {
+      hasIncludedLabels = false;
+    }
 
     if (this.labels) {
       for (const label of this.labels) {
-        if (includedLabels[0]) {
+        if (hasIncludedLabels) {
           if (includedLabels.includes(label)) containsIncludedLabel = true;
         } else {
           containsIncludedLabel = true;
@@ -99,7 +96,7 @@ export class Issue {
         }
       }
     } else {
-      if (!includedLabels[0]) {
+      if (!hasIncludedLabels) {
         containsIncludedLabel = true;
       }
     }
