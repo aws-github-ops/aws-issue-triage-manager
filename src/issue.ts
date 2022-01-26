@@ -78,7 +78,7 @@ export class Issue {
 
     console.log(includedLabels[0]);
 
-    if (includedLabels[0] === '') {
+    if (includedLabels[0] == '') {
       hasIncludedLabels = false;
     }
 
