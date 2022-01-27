@@ -157,12 +157,11 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
 
 test('VerifyIssueType returns true when target is both', async () => {
   process.env.INPUT_TARGET = 'both';
-
-  const githubApi = new GithubApi('GITHUB_TOKEN');
-
   const data = {
     pull_request: ['pullrequest'],
   };
+
+  const githubApi = new GithubApi('GITHUB_TOKEN');
 
   expect(githubApi.verifyIssueType(data)).toStrictEqual(true);
 });
