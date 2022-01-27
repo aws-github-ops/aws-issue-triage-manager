@@ -11,4 +11,5 @@ export declare class GithubApi {
     setIssueAssignees(assignees: string[]): Promise<void>;
     setIssueLabels(labels: string[]): Promise<void>;
     getIssueContent(): Promise<IIssueData>;
+    verifyIssueType(data: any): boolean;
 }

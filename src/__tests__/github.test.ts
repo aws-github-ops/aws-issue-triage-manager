@@ -151,5 +151,43 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
     title: 'test-title',
     body: 'test-body',
     labels: ['needs-triage'],
+    isValidIssueType: true,
   });
+});
+
+test('VerifyIssueType returns true when target is both', async () => {
+  process.env.INPUT_TARGET = 'both';
+  const data = {
+    pull_request: ['pullrequest'],
+  };
+
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+
+  expect(githubApi.verifyIssueType(data)).toStrictEqual(true);
+});
+
+test('VerifyIssueType returns correct value when target is issues', async () => {
+  process.env.INPUT_TARGET = 'issues';
+  const prData = {
+    pull_request: ['pullrequest'],
+  };
+  const issueData = undefined;
+
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+
+  expect(githubApi.verifyIssueType(prData)).toStrictEqual(false);
+  expect(githubApi.verifyIssueType(issueData)).toStrictEqual(true);
+});
+
+test('VerifyIssueType returns correct value when target is pull-requests', async () => {
+  process.env.INPUT_TARGET = 'pull-requests';
+  const prData = {
+    pull_request: ['pullrequest'],
+  };
+  const issueData = undefined;
+
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+
+  expect(githubApi.verifyIssueType(prData)).toStrictEqual(true);
+  expect(githubApi.verifyIssueType(issueData)).toStrictEqual(false);
 });

@@ -9,6 +9,14 @@ async function run() {
   const token = core.getInput('github-token');
   const github: GithubApi = new GithubApi(token);
   const content: IIssueData = await github.getIssueContent();
+
+  if (!content.isValidIssueType) {
+    core.info(
+      'This issue is not the correct target type. Exiting successfully'
+    );
+    return;
+  }
+
   const includedLabels: string[] | undefined = core
     .getInput('included-labels', {required: false})
     .replace(/\[|\]/gi, '')
