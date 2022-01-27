@@ -28070,12 +28070,16 @@ class GithubApi {
             for (const label of data.labels) {
                 labels.push(label.name.toString());
             }
+            console.log(data.pull_request);
             return {
                 title,
                 body,
                 labels,
             };
         });
+    }
+    isIssue() {
+        return false;
     }
 }
 exports.GithubApi = GithubApi;

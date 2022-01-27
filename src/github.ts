@@ -57,10 +57,16 @@ export class GithubApi {
       labels.push(label.name.toString());
     }
 
+    console.log(data.pull_request);
+
     return {
       title,
       body,
       labels,
     };
+  }
+
+  public isIssue(): boolean {
+    return false;
   }
 }
