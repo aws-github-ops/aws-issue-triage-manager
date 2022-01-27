@@ -4,6 +4,10 @@ inputs:
   github-token:
     description: "Github token"
     required: true
+  target:
+    description: "Choose to function only on issues, PRs, or both"
+    required: false
+    default: "both"
   parameters:
     description: "JSON array of keywords to look for and labels and assignees to be set when there's a keyword match"
     required: true
