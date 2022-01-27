@@ -49,6 +49,10 @@ export class GithubApi {
       issue_number: this.issueNumber,
     });
 
+    const isValidIssueType = this.verifyIssueType(data.pull_request);
+
+    if (!isValidIssueType) return {isValidIssueType: false};
+
     const title: string = data.title;
     const body: string = data.body;
     const labels: string[] = [];
@@ -57,16 +61,33 @@ export class GithubApi {
       labels.push(label.name.toString());
     }
 
-    console.log(data.pull_request);
-
     return {
       title,
       body,
       labels,
+      isValidIssueType,
     };
   }
 
-  public isIssue(): boolean {
-    return false;
+  public verifyIssueType(data): boolean {
+    const target = core.getInput('target', {required: false});
+
+    if (target === 'both') {
+      return true;
+    } else if (target === 'issues') {
+      if (!data) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (target === 'pull-requests') {
+      if (data) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

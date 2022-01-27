@@ -2,6 +2,7 @@ export interface IIssueData {
     title?: string;
     body?: string;
     labels?: string[];
+    isValidIssueType?: boolean;
 }
 export interface IParameter extends IDefaultArea {
     area: string;

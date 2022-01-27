@@ -28064,22 +28064,45 @@ class GithubApi {
     getIssueContent() {
         return __awaiter(this, void 0, void 0, function* () {
             const { data } = yield this.octokit.issues.get(Object.assign(Object.assign({}, this.repo), { issue_number: this.issueNumber }));
+            const isValidIssueType = this.verifyIssueType(data.pull_request);
+            if (!isValidIssueType)
+                return { isValidIssueType: false };
             const title = data.title;
             const body = data.body;
             const labels = [];
             for (const label of data.labels) {
                 labels.push(label.name.toString());
             }
-            console.log(data.pull_request);
             return {
                 title,
                 body,
                 labels,
+                isValidIssueType,
             };
         });
     }
-    isIssue() {
-        return false;
+    verifyIssueType(data) {
+        const target = core.getInput('target', { required: false });
+        if (target === 'both') {
+            return true;
+        }
+        else if (target === 'issues') {
+            if (!data) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else if (target === 'pull-requests') {
+            if (data) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        return true;
     }
 }
 exports.GithubApi = GithubApi;
@@ -28131,6 +28154,10 @@ function run() {
         const token = core.getInput('github-token');
         const github = new github_1.GithubApi(token);
         const content = yield github.getIssueContent();
+        if (!content.isValidIssueType) {
+            core.info('This issue is not the correct target type. Exiting successfully');
+            return;
+        }
         const includedLabels = core
             .getInput('included-labels', { required: false })
             .replace(/\[|\]/gi, '')
