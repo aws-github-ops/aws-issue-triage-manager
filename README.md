@@ -65,6 +65,11 @@ If no keywords are detected in your issue, set these default labels and assignee
 }
 ```
 
+### target
+Select whether to run only on issues, pull requests, or both. Valid values are `issues`, `pull-requests`, and `both`
+
+The default value is **both**
+
 ### area-is-keyword
 Setting this to `true` will consider the title of the area to be a keyword of that area
 
