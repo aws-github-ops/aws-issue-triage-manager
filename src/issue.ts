@@ -12,6 +12,9 @@ export interface IIssueData {
 export interface IParameter extends IDefaultArea {
   area: string;
   keywords: string[];
+  affixes?: IAffix;
+  enableGlobalAffixes?: boolean;
+  areaIsKeyword?: boolean;
 }
 
 export interface IDefaultArea {
@@ -19,34 +22,51 @@ export interface IDefaultArea {
   assignees?: string[];
 }
 
+export interface IAffix {
+  prefixes?: string[];
+  suffixes?: string[];
+}
+
 export class Issue {
   private titleIssueWords?: string[];
   private bodyIssueWords?: string[];
-  public parameters: IParameter[];
+  public readonly parameters: IParameter[];
   public defaultArea?: IDefaultArea;
   private similarity: number;
   private bodyValue: number;
-  private areaIsKeyword: boolean;
   private labels: string[] | undefined;
+  private globalAffixes?: IAffix;
 
   constructor(content: IIssueData) {
     this.labels = content.labels;
     this.parameters = JSON.parse(core.getInput('parameters', {required: true}));
     this.similarity = +core.getInput('similarity', {required: false});
     this.bodyValue = +core.getInput('body-value', {required: false});
+    const globalAffixes = core.getInput('affixes', {required: false});
+    if (globalAffixes) {
+      this.globalAffixes = JSON.parse(globalAffixes);
+    }
+    const defaultAreaInput = core.getInput('default-area', {required: false});
+    if (defaultAreaInput) {
+      this.defaultArea = JSON.parse(defaultAreaInput);
+    }
 
+    // Area is keyword handling
     const areaIsKeywordInput: string = core.getInput('area-is-keyword', {
       required: false,
     });
-    areaIsKeywordInput.toLowerCase() === 'true'
-      ? (this.areaIsKeyword = true)
-      : (this.areaIsKeyword = false);
+    if (areaIsKeywordInput) {
+      if (areaIsKeywordInput.toLowerCase() === 'true') this.addAreaToKeywords();
+    }
 
+    // Handle affixes after all keywords are added
+    this.attachAffixes();
+
+    // Parse words from issue
     const excluded: string[] = core
       .getInput('excluded-expressions', {required: false})
       .replace(/\[|\]/gi, '')
       .split('|');
-
     const title = content.title;
     if (title) {
       excluded.forEach(ex => {
@@ -54,18 +74,12 @@ export class Issue {
       });
       this.titleIssueWords = title.split(/ |\(|\)|\./);
     }
-
     const body = content.body;
     if (body) {
       excluded.forEach(ex => {
         body.replace(ex, '');
       });
       this.bodyIssueWords = body.split(/ |\(|\)|\./);
-    }
-
-    const defaultAreaInput = core.getInput('default-area', {required: false});
-    if (defaultAreaInput) {
-      this.defaultArea = JSON.parse(defaultAreaInput);
     }
   }
 
@@ -167,13 +181,6 @@ export class Issue {
     value
   ): Map<string, number> {
     this.parameters.forEach(obj => {
-      if (this.areaIsKeyword) {
-        if (this.similarStrings(content, obj.area)) {
-          potentialAreas.has(obj.area)
-            ? potentialAreas.set(obj.area, potentialAreas.get(obj.area) + value)
-            : potentialAreas.set(obj.area, value);
-        }
-      }
       obj.keywords.forEach(keyword => {
         if (this.similarStrings(content, keyword)) {
           potentialAreas.has(obj.area)
@@ -225,5 +232,55 @@ export class Issue {
     // with a set percentage of the average length of said strings
     if (levenshtein(str1, str2) <= this.isSimilar(str1, str2)) return true;
     else return false;
+  }
+
+  private addAreaToKeywords() {
+    for (const parameter of this.parameters) {
+      if (parameter.areaIsKeyword !== false)
+        parameter.keywords.push(parameter.area);
+    }
+  }
+
+  private attachAffixes() {
+    for (const parameter of this.parameters) {
+      if (!parameter.affixes && !this.globalAffixes) continue;
+      let prefixes: string[] = [];
+      let suffixes: string[] = [];
+      if (this.globalAffixes && parameter.enableGlobalAffixes !== false) {
+        if (this.globalAffixes.prefixes)
+          prefixes = prefixes.concat(this.globalAffixes.prefixes);
+        if (this.globalAffixes.suffixes)
+          suffixes = suffixes.concat(this.globalAffixes.suffixes);
+      }
+      if (parameter.affixes) {
+        if (parameter.affixes.prefixes)
+          prefixes = prefixes.concat(parameter.affixes.prefixes);
+        if (parameter.affixes.suffixes)
+          suffixes = suffixes.concat(parameter.affixes.suffixes);
+      }
+
+      const affixedKeywords: string[] = [];
+      for (const prefix of prefixes) {
+        for (const keyword of parameter.keywords) {
+          affixedKeywords.push(prefix.concat(keyword));
+        }
+        // Combine prefixes with suffixes
+        for (const suffix of suffixes) {
+          for (const keyword of parameter.keywords) {
+            affixedKeywords.push(prefix.concat(keyword.concat(suffix)));
+          }
+        }
+      }
+      for (const suffix of suffixes) {
+        for (const keyword of parameter.keywords) {
+          affixedKeywords.push(keyword.concat(suffix));
+        }
+      }
+
+      if (affixedKeywords.length)
+        parameter.keywords = parameter.keywords.concat(affixedKeywords);
+
+      // Remove duplicate values
+    }
   }
 }

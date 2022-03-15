@@ -51,9 +51,24 @@ Parameters should take the form
     "area": "area",
     "keywords": ["keywords"],
     "labels": ["labels"],
-    "assignees": ["assignees"]
+    "assignees": ["assignees"],
+    "affixes": {
+      "prefixes": ["prefix"],
+      "suffixes": ["suffix"]
+    }
   }
 ]
+```
+
+note: `labels`, `assignees`, and `affixes` are not required
+
+### affixes
+Affixes (prefixes and suffixes) to append or prepend to _all_ keywords
+```json
+{
+  "prefixes": ["prefix"],
+  "suffixes": ["suffix"]
+}
 ```
 
 ### default-area

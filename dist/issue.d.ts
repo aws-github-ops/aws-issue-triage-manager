@@ -7,20 +7,27 @@ export interface IIssueData {
 export interface IParameter extends IDefaultArea {
     area: string;
     keywords: string[];
+    affixes?: IAffix;
+    enableGlobalAffixes?: boolean;
+    areaIsKeyword?: boolean;
 }
 export interface IDefaultArea {
     labels?: string[];
     assignees?: string[];
 }
+export interface IAffix {
+    prefixes?: string[];
+    suffixes?: string[];
+}
 export declare class Issue {
     private titleIssueWords?;
     private bodyIssueWords?;
-    parameters: IParameter[];
+    readonly parameters: IParameter[];
     defaultArea?: IDefaultArea;
     private similarity;
     private bodyValue;
-    private areaIsKeyword;
     private labels;
+    private globalAffixes?;
     constructor(content: IIssueData);
     verifyIssueLabels(includedLabels: string[], excludedLabels: string[]): boolean;
     determineArea(): string;
@@ -29,4 +36,6 @@ export declare class Issue {
     private decideWinner;
     private isSimilar;
     private similarStrings;
+    private addAreaToKeywords;
+    private attachAffixes;
 }

@@ -35,6 +35,9 @@ inputs:
     description: "How much each keyword in issue body is weighted"
     required: false
     default: ".025"
+  affixes:
+    description: "Strings to append or prepend to all keywords"
+    required: false
 
 outputs:
   title:
