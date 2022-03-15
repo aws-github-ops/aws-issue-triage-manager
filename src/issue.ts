@@ -279,8 +279,6 @@ export class Issue {
 
       if (affixedKeywords.length)
         parameter.keywords = parameter.keywords.concat(affixedKeywords);
-
-      // Remove duplicate values
     }
   }
 }
