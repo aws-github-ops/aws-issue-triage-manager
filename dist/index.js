@@ -28411,6 +28411,8 @@ class Issue {
     }
     attachAffixes() {
         for (const parameter of this.parameters) {
+            if (!parameter.affixes && !this.globalAffixes)
+                continue;
             let prefixes = [];
             let suffixes = [];
             if (this.globalAffixes && parameter.enableGlobalAffixes !== false) {
@@ -28430,6 +28432,12 @@ class Issue {
                 for (const keyword of parameter.keywords) {
                     affixedKeywords.push(prefix.concat(keyword));
                 }
+                // Combine prefixes with suffixes
+                for (const suffix of suffixes) {
+                    for (const keyword of parameter.keywords) {
+                        affixedKeywords.push(prefix.concat(keyword.concat(suffix)));
+                    }
+                }
             }
             for (const suffix of suffixes) {
                 for (const keyword of parameter.keywords) {
@@ -28438,6 +28446,7 @@ class Issue {
             }
             if (affixedKeywords.length)
                 parameter.keywords = parameter.keywords.concat(affixedKeywords);
+            // Remove duplicate values
         }
     }
 }
