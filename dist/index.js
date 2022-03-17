@@ -28252,8 +28252,9 @@ class Issue {
             required: false,
         });
         if (areaIsKeywordInput) {
-            if (areaIsKeywordInput.toLowerCase() === 'true')
+            if (areaIsKeywordInput.toLowerCase() === 'true') {
                 this.addAreaToKeywords();
+            }
         }
         // Handle affixes after all keywords are added
         this.attachAffixes();
@@ -28283,8 +28284,9 @@ class Issue {
         if (this.labels) {
             for (const label of this.labels) {
                 if (includedLabels) {
-                    if (includedLabels.includes(label))
+                    if (includedLabels.includes(label)) {
                         containsIncludedLabel = true;
+                    }
                 }
                 if (excludedLabels) {
                     if (excludedLabels.includes(label)) {
@@ -28328,11 +28330,13 @@ class Issue {
                 potentialAreas = this.scoreArea(content, potentialAreas, this.bodyValue);
             });
         }
-        if (potentialAreas.size > 0)
+        if (potentialAreas.size > 0) {
             console.log('Area scores: ', ...potentialAreas);
+        }
         const winningArea = this.decideWinner(potentialAreas);
-        if (winningArea)
+        if (winningArea) {
             core.info('Winning area: ' + winningArea);
+        }
         return winningArea;
     }
     getWinningAreaData(winningArea) {
@@ -28398,35 +28402,45 @@ class Issue {
         // levenshtein returns a value between 0 and the length of the strings being compared. This
         // represents the number of character differences between compared strings. We compare this
         // with a set percentage of the average length of said strings
-        if ((0, js_levenshtein_1.default)(str1, str2) <= this.isSimilar(str1, str2))
+        if ((0, js_levenshtein_1.default)(str1, str2) <= this.isSimilar(str1, str2)) {
             return true;
-        else
+        }
+        else {
             return false;
+        }
     }
     addAreaToKeywords() {
         for (const parameter of this.parameters) {
-            if (parameter.areaIsKeyword !== false)
+            if (parameter.areaIsKeyword !== false) {
                 parameter.keywords.push(parameter.area);
+            }
         }
     }
     attachAffixes() {
         for (const parameter of this.parameters) {
-            if (!parameter.affixes && !this.globalAffixes)
+            if (!parameter.affixes && !this.globalAffixes) {
                 continue;
+            }
+            // Obtain list of prefixes and suffixes for area
             let prefixes = [];
             let suffixes = [];
             if (this.globalAffixes && parameter.enableGlobalAffixes !== false) {
-                if (this.globalAffixes.prefixes)
+                if (this.globalAffixes.prefixes) {
                     prefixes = prefixes.concat(this.globalAffixes.prefixes);
-                if (this.globalAffixes.suffixes)
+                }
+                if (this.globalAffixes.suffixes) {
                     suffixes = suffixes.concat(this.globalAffixes.suffixes);
+                }
             }
             if (parameter.affixes) {
-                if (parameter.affixes.prefixes)
+                if (parameter.affixes.prefixes) {
                     prefixes = prefixes.concat(parameter.affixes.prefixes);
-                if (parameter.affixes.suffixes)
+                }
+                if (parameter.affixes.suffixes) {
                     suffixes = suffixes.concat(parameter.affixes.suffixes);
+                }
             }
+            // Apply all combinations of prefixes and suffixes to keywords
             const affixedKeywords = [];
             for (const prefix of prefixes) {
                 for (const keyword of parameter.keywords) {
@@ -28444,8 +28458,10 @@ class Issue {
                     affixedKeywords.push(keyword.concat(suffix));
                 }
             }
-            if (affixedKeywords.length)
+            // Add all combinations of affixed keywords to keywords for area
+            if (affixedKeywords.length) {
                 parameter.keywords = parameter.keywords.concat(affixedKeywords);
+            }
         }
     }
 }
