@@ -4,7 +4,9 @@ Github action for automatically adding labels and/or setting assignees when an I
 
 ## What it does
 
-This action will automatically determine a single area out of many to which an issue belongs based on a list of keywords. It will then automatically add labels and set assignees to that issue depending on which area the issue lies in
+This action will automatically determine a single area out of many to which an issue belongs based on a list of keywords. It will then automatically add labels and set assignees to that issue depending on which area the issue lies in.
+
+This is useful for repositories with many different clear areas of responsibility. See the AWS CDK repository for an [example](https://github.com/aws/aws-cdk/blob/master/.github/workflows/issue-label-assign.yml) of how this action can be configured.
 
 ### Scoring
 
@@ -71,6 +73,9 @@ Affixes (prefixes and suffixes) to append or prepend to _all_ keywords
 }
 ```
 
+The original keywords you add to each area will still be checked. Affixes will only *add* keywords to check.
+For example, if for an area you have an affix `aws-` and a keyword `ec2`, the keywords that will be checked for that area will be `aws-ec2` and `ec2`.
+
 ### default-area
 If no keywords are detected in your issue, set these default labels and assignees
 ```json
@@ -104,7 +109,7 @@ A set constant for how much each keyword detected in the body of the issue is wo
 The default value is **.025**
 
 ### included-labels
-Conditionally run this action based on the labels present on the issue. Will only run on issues with the specified labels
+Conditionally run this action based on the labels present on the issue. Will only run on issues with any the specified labels
 
 If no input is provided, the action will always run
 
@@ -133,6 +138,8 @@ jobs:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           excluded-expressions: "[ TypeScript | Java | Python ]"
 ```
+
+[Example](https://github.com/aws/aws-cdk/blob/master/.github/workflows/issue-label-assign.yml) of this action being configured and used in the AWS CDK repository
 
 
 ## Contributing
