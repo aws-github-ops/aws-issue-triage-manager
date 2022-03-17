@@ -28239,12 +28239,26 @@ class Issue {
         this.parameters = JSON.parse(core.getInput('parameters', { required: true }));
         this.similarity = +core.getInput('similarity', { required: false });
         this.bodyValue = +core.getInput('body-value', { required: false });
+        const globalAffixes = core.getInput('affixes', { required: false });
+        if (globalAffixes) {
+            this.globalAffixes = JSON.parse(globalAffixes);
+        }
+        const defaultAreaInput = core.getInput('default-area', { required: false });
+        if (defaultAreaInput) {
+            this.defaultArea = JSON.parse(defaultAreaInput);
+        }
+        // Area is keyword handling
         const areaIsKeywordInput = core.getInput('area-is-keyword', {
             required: false,
         });
-        areaIsKeywordInput.toLowerCase() === 'true'
-            ? (this.areaIsKeyword = true)
-            : (this.areaIsKeyword = false);
+        if (areaIsKeywordInput) {
+            if (areaIsKeywordInput.toLowerCase() === 'true') {
+                this.addAreaToKeywords();
+            }
+        }
+        // Handle affixes after all keywords are added
+        this.attachAffixes();
+        // Parse words from issue
         const excluded = core
             .getInput('excluded-expressions', { required: false })
             .replace(/\[|\]/gi, '')
@@ -28263,10 +28277,6 @@ class Issue {
             });
             this.bodyIssueWords = body.split(/ |\(|\)|\./);
         }
-        const defaultAreaInput = core.getInput('default-area', { required: false });
-        if (defaultAreaInput) {
-            this.defaultArea = JSON.parse(defaultAreaInput);
-        }
     }
     verifyIssueLabels(includedLabels, excludedLabels) {
         let containsIncludedLabel = false;
@@ -28274,8 +28284,9 @@ class Issue {
         if (this.labels) {
             for (const label of this.labels) {
                 if (includedLabels) {
-                    if (includedLabels.includes(label))
+                    if (includedLabels.includes(label)) {
                         containsIncludedLabel = true;
+                    }
                 }
                 if (excludedLabels) {
                     if (excludedLabels.includes(label)) {
@@ -28319,11 +28330,13 @@ class Issue {
                 potentialAreas = this.scoreArea(content, potentialAreas, this.bodyValue);
             });
         }
-        if (potentialAreas.size > 0)
+        if (potentialAreas.size > 0) {
             console.log('Area scores: ', ...potentialAreas);
+        }
         const winningArea = this.decideWinner(potentialAreas);
-        if (winningArea)
+        if (winningArea) {
             core.info('Winning area: ' + winningArea);
+        }
         return winningArea;
     }
     getWinningAreaData(winningArea) {
@@ -28342,13 +28355,6 @@ class Issue {
     }
     scoreArea(content, potentialAreas, value) {
         this.parameters.forEach(obj => {
-            if (this.areaIsKeyword) {
-                if (this.similarStrings(content, obj.area)) {
-                    potentialAreas.has(obj.area)
-                        ? potentialAreas.set(obj.area, potentialAreas.get(obj.area) + value)
-                        : potentialAreas.set(obj.area, value);
-                }
-            }
             obj.keywords.forEach(keyword => {
                 if (this.similarStrings(content, keyword)) {
                     potentialAreas.has(obj.area)
@@ -28396,10 +28402,67 @@ class Issue {
         // levenshtein returns a value between 0 and the length of the strings being compared. This
         // represents the number of character differences between compared strings. We compare this
         // with a set percentage of the average length of said strings
-        if ((0, js_levenshtein_1.default)(str1, str2) <= this.isSimilar(str1, str2))
+        if ((0, js_levenshtein_1.default)(str1, str2) <= this.isSimilar(str1, str2)) {
             return true;
-        else
+        }
+        else {
             return false;
+        }
+    }
+    addAreaToKeywords() {
+        for (const parameter of this.parameters) {
+            if (parameter.areaIsKeyword !== false) {
+                parameter.keywords.push(parameter.area);
+            }
+        }
+    }
+    attachAffixes() {
+        for (const parameter of this.parameters) {
+            if (!parameter.affixes && !this.globalAffixes) {
+                continue;
+            }
+            // Obtain list of prefixes and suffixes for area
+            let prefixes = [];
+            let suffixes = [];
+            if (this.globalAffixes && parameter.enableGlobalAffixes !== false) {
+                if (this.globalAffixes.prefixes) {
+                    prefixes = prefixes.concat(this.globalAffixes.prefixes);
+                }
+                if (this.globalAffixes.suffixes) {
+                    suffixes = suffixes.concat(this.globalAffixes.suffixes);
+                }
+            }
+            if (parameter.affixes) {
+                if (parameter.affixes.prefixes) {
+                    prefixes = prefixes.concat(parameter.affixes.prefixes);
+                }
+                if (parameter.affixes.suffixes) {
+                    suffixes = suffixes.concat(parameter.affixes.suffixes);
+                }
+            }
+            // Apply all combinations of prefixes and suffixes to keywords
+            const affixedKeywords = [];
+            for (const prefix of prefixes) {
+                for (const keyword of parameter.keywords) {
+                    affixedKeywords.push(prefix.concat(keyword));
+                }
+                // Combine prefixes with suffixes
+                for (const suffix of suffixes) {
+                    for (const keyword of parameter.keywords) {
+                        affixedKeywords.push(prefix.concat(keyword.concat(suffix)));
+                    }
+                }
+            }
+            for (const suffix of suffixes) {
+                for (const keyword of parameter.keywords) {
+                    affixedKeywords.push(keyword.concat(suffix));
+                }
+            }
+            // Add all combinations of affixed keywords to keywords for area
+            if (affixedKeywords.length) {
+                parameter.keywords = parameter.keywords.concat(affixedKeywords);
+            }
+        }
     }
 }
 exports.Issue = Issue;

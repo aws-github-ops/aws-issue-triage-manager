@@ -458,3 +458,164 @@ test('verifyIssueLabels returns true, when no included-labels are specified and 
 
   expect(result).toStrictEqual(true);
 });
+
+test('areaIsKeyword is disabled by default', () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: ['cognito'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+    },
+  ]);
+  process.env['INPUT_AREA-IS-KEYWORD'] = 'false';
+
+  const title = '(@aws-cdk/aws-cognito): This is a title';
+  const body = '(This) is a body';
+  const labels = ['needs-triage'];
+  const issue = new Issue({
+    title,
+    body,
+    labels,
+  });
+
+  expect(issue.parameters).toStrictEqual([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: ['cognito'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+    },
+  ]);
+});
+
+test('keywords includes global affixes when specified', () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([
+    {
+      area: '@aws-cdk/aws-s3',
+      keywords: ['aws-s3'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+    },
+  ]);
+  process.env.INPUT_AFFIXES = JSON.stringify({
+    prefixes: ['@aws-cdk/'],
+  });
+  const title = '(@aws-cdk/aws-s3): This is a title';
+  const body = '(This) is a body';
+  const labels = ['needs-triage'];
+  const issue = new Issue({
+    title,
+    body,
+    labels,
+  });
+
+  expect(issue.parameters).toStrictEqual([
+    {
+      area: '@aws-cdk/aws-s3',
+      keywords: ['aws-s3', '@aws-cdk/aws-s3'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+    },
+  ]);
+});
+
+test('area-specific affix settings works correctly with global settings', () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: ['cognito'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+      affixes: {
+        prefixes: ['aws-'],
+        suffixes: ['-alpha'],
+      },
+    },
+    {
+      area: '@aws-cdk/aws-lambda',
+      keywords: ['lambda'],
+      enableGlobalAffixes: false,
+    },
+  ]);
+  process.env.INPUT_AFFIXES = JSON.stringify({
+    prefixes: ['@aws-cdk/'],
+  });
+  const title = '(@aws-cdk/aws-s3): This is a title';
+  const body = '(This) is a body';
+  const labels = ['needs-triage'];
+  const issue = new Issue({
+    title,
+    body,
+    labels,
+  });
+
+  expect(issue.parameters).toStrictEqual([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: [
+        'cognito',
+        '@aws-cdk/cognito',
+        '@aws-cdk/cognito-alpha',
+        'aws-cognito',
+        'aws-cognito-alpha',
+        'cognito-alpha',
+      ],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+      affixes: {
+        prefixes: ['aws-'],
+        suffixes: ['-alpha'],
+      },
+    },
+    {
+      area: '@aws-cdk/aws-lambda',
+      keywords: ['lambda'],
+      enableGlobalAffixes: false,
+    },
+  ]);
+});
+
+test('keywords include only their specifically defined affixes', () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: ['cognito'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+      affixes: {
+        suffixes: ['-alpha'],
+      },
+    },
+    {
+      area: '@aws-cdk/aws-lambda',
+      keywords: ['lambda'],
+    },
+  ]);
+  process.env.INPUT_AFFIXES = JSON.stringify({});
+
+  const title = '(@aws-cdk/aws-cognito): This is a title';
+  const body = '(This) is a body';
+  const labels = ['needs-triage'];
+  const issue = new Issue({
+    title,
+    body,
+    labels,
+  });
+
+  expect(issue.parameters).toStrictEqual([
+    {
+      area: '@aws-cdk/aws-cognito',
+      keywords: ['cognito', 'cognito-alpha'],
+      labels: ['a', 'b', 'c'],
+      assignees: ['d', 'e', 'f'],
+      affixes: {
+        suffixes: ['-alpha'],
+      },
+    },
+    {
+      area: '@aws-cdk/aws-lambda',
+      keywords: ['lambda'],
+    },
+  ]);
+});
