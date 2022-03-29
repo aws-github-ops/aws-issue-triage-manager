@@ -57,7 +57,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@actions/core": "^1.6.0",
-    "@actions/github": "^2.2.0",
+    "@actions/github": "^5.0.0",
     "js-levenshtein": "^1.1.6"
   },
   "devDependencies": {

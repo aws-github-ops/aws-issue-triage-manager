@@ -18,7 +18,7 @@ export class GithubApi {
   private issueNumber: number | undefined;
 
   constructor(token: string) {
-    this.octokit = new github.GitHub(token);
+    this.octokit = github.getOctokit(token);
     this.repo = github.context.repo;
 
     if (github.context.payload.issue) {
@@ -32,7 +32,7 @@ export class GithubApi {
 
   public async setIssueAssignees(assignees: string[]) {
     if (!assignees.length) return;
-    await this.octokit.issues.addAssignees({
+    await this.octokit.rest.issues.addAssignees({
       ...this.repo,
       issue_number: this.issueNumber,
       assignees,
@@ -41,7 +41,7 @@ export class GithubApi {
 
   public async setIssueLabels(labels: string[]) {
     if (!labels.length) return;
-    await this.octokit.issues.addLabels({
+    await this.octokit.rest.issues.addLabels({
       ...this.repo,
       issue_number: this.issueNumber,
       labels,
@@ -50,7 +50,7 @@ export class GithubApi {
 
   public async setReviewers(reviewers: IReviewers) {
     if (!reviewers.reviewers.length && !reviewers.teamReviewers.length) return;
-    await this.octokit.pulls.requestReviewers({
+    await this.octokit.rest.pulls.requestReviewers({
       ...this.repo,
       pull_number: this.issueNumber,
       reviewers: reviewers.reviewers.length ? reviewers.reviewers : undefined,
@@ -60,7 +60,7 @@ export class GithubApi {
   }
 
   public async getIssueContent(): Promise<IIssueData> {
-    const {data} = await this.octokit.issues.get({
+    const {data} = await this.octokit.rest.issues.get({
       ...this.repo,
       issue_number: this.issueNumber,
     });

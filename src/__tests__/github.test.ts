@@ -82,12 +82,13 @@ test("setIssueAssignees() requests GitHub's API, when provided an array of assig
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.addAssignees = jest.fn();
+  githubApi['octokit'].rest.issues.addAssignees = jest.fn();
 
   await githubApi.setIssueAssignees(['test-assignee-1', 'test-assignee-2']);
 
-  expect(githubApi['octokit'].issues.addAssignees).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.addAssignees).toHaveBeenCalledWith({
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledWith({
     assignees: ['test-assignee-1', 'test-assignee-2'],
     issue_number: 54321,
   });
@@ -106,12 +107,12 @@ test("setIssueLabels() requests GitHub's API, when provided an array of labels",
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.addLabels = jest.fn();
+  githubApi['octokit'].rest.issues.addLabels = jest.fn();
 
   await githubApi.setIssueLabels(['needs-triage', 'aws-cognito']);
 
-  expect(githubApi['octokit'].issues.addLabels).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.addLabels).toHaveBeenCalledWith({
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledWith({
     issue_number: 54321,
     labels: ['needs-triage', 'aws-cognito'],
   });
@@ -130,19 +131,22 @@ test("setIssueLabels() requests GitHub's API, when provided a set of reviewers",
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].pulls.requestReviewers = jest.fn();
+  githubApi['octokit'].rest.pulls.requestReviewers = jest.fn();
 
   await githubApi.setReviewers({
     reviewers: ['user1'],
     teamReviewers: ['team1'],
   });
 
-  expect(githubApi['octokit'].pulls.requestReviewers).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].pulls.requestReviewers).toHaveBeenCalledWith({
-    pull_number: 54321,
-    reviewers: ['user1'],
-    team_reviewers: ['team1'],
-  });
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledWith(
+    {
+      pull_number: 54321,
+      reviewers: ['user1'],
+      team_reviewers: ['team1'],
+    }
+  );
 });
 
 test("getIssueContent() requests GitHub's API, when issueNumber is set", async () => {
@@ -158,7 +162,7 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.get = jest.fn().mockReturnValue({
+  githubApi['octokit'].rest.issues.get = jest.fn().mockReturnValue({
     data: {
       title: 'test-title',
       body: 'test-body',
@@ -173,8 +177,8 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
 
   const content = await githubApi.getIssueContent();
 
-  expect(githubApi['octokit'].issues.get).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.get).toHaveBeenCalledWith({
+  expect(githubApi['octokit'].rest.issues.get).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.get).toHaveBeenCalledWith({
     issue_number: 54321,
   });
   expect(content).toStrictEqual({
