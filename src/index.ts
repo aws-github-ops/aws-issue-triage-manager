@@ -47,8 +47,8 @@ async function run() {
       if (issue.defaultArea.labels)
         github.setIssueLabels(issue.defaultArea.labels);
       // eslint-disable-next-line prettier/prettier
-      if (winningAreaData.reviewers && issue.issueType === IssueType.PULL_REQUEST)
-        github.setReviewers(winningAreaData.reviewers);
+      if (issue.defaultArea.reviewers && issue.issueType === IssueType.PULL_REQUEST)
+        github.setReviewers(issue.defaultArea.reviewers);
     }
   } else {
     // eslint-disable-next-line prettier/prettier
