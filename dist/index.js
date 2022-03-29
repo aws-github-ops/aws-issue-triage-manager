@@ -28033,6 +28033,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GithubApi = void 0;
 const github = __importStar(__nccwpck_require__(5438));
 const core = __importStar(__nccwpck_require__(2186));
+const issue_1 = __nccwpck_require__(769);
 class GithubApi {
     constructor(token) {
         this.octokit = new github.GitHub(token);
@@ -28061,10 +28062,20 @@ class GithubApi {
             yield this.octokit.issues.addLabels(Object.assign(Object.assign({}, this.repo), { issue_number: this.issueNumber, labels }));
         });
     }
+    setReviewers(reviewers) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!reviewers.reviewers.length && !reviewers.teamReviewers.length)
+                return;
+            yield this.octokit.pulls.requestReviewers(Object.assign(Object.assign({}, this.repo), { pull_number: this.issueNumber, reviewers: reviewers.reviewers.length ? reviewers.reviewers : undefined, 
+                // eslint-disable-next-line prettier/prettier
+                team_reviewers: reviewers.teamReviewers.length ? reviewers.teamReviewers : undefined }));
+        });
+    }
     getIssueContent() {
         return __awaiter(this, void 0, void 0, function* () {
             const { data } = yield this.octokit.issues.get(Object.assign(Object.assign({}, this.repo), { issue_number: this.issueNumber }));
-            const isValidIssueType = this.verifyIssueType(data.pull_request);
+            const issueType = this.getIssueType(data.pull_request);
+            const isValidIssueType = this.verifyIssueType(data.pull_request, issueType);
             if (!isValidIssueType)
                 return { isValidIssueType: false };
             const title = data.title;
@@ -28078,31 +28089,24 @@ class GithubApi {
                 body,
                 labels,
                 isValidIssueType,
+                issueType,
             };
         });
     }
-    verifyIssueType(data) {
+    getIssueType(data) {
+        return data ? issue_1.IssueType.PULL_REQUEST : issue_1.IssueType.ISSUE;
+    }
+    verifyIssueType(data, issueType) {
         const target = core.getInput('target', { required: false });
-        if (target === 'both') {
+        // eslint-disable-next-line prettier/prettier
+        if (target === 'both')
             return true;
-        }
-        else if (target === 'issues') {
-            if (!data) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else if (target === 'pull-requests') {
-            if (data) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        return true;
+        else if (target === issue_1.IssueType.ISSUE && issueType === issue_1.IssueType.ISSUE)
+            return true;
+        // eslint-disable-next-line prettier/prettier
+        else if (target === issue_1.IssueType.PULL_REQUEST && issueType === issue_1.IssueType.PULL_REQUEST)
+            return true;
+        return false;
     }
 }
 exports.GithubApi = GithubApi;
@@ -28185,10 +28189,13 @@ function run() {
             }
         }
         else {
-            if (winningAreaData.assignees)
-                github.setIssueAssignees(winningAreaData.assignees);
+            // eslint-disable-next-line prettier/prettier
             if (winningAreaData.labels)
                 github.setIssueLabels(winningAreaData.labels);
+            if (winningAreaData.assignees)
+                github.setIssueAssignees(winningAreaData.assignees);
+            if (winningAreaData.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
+                github.setReviewers(winningAreaData.reviewers);
             core.setOutput('labeled', true.toString());
             core.setOutput('assigned', true.toString());
         }
@@ -28229,16 +28236,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Issue = void 0;
+exports.Issue = exports.IssueType = void 0;
 /* eslint-disable no-control-regex */
 const core = __importStar(__nccwpck_require__(2186));
 const js_levenshtein_1 = __importDefault(__nccwpck_require__(7468));
+var IssueType;
+(function (IssueType) {
+    IssueType["ISSUE"] = "issues";
+    IssueType["PULL_REQUEST"] = "pull-requests";
+})(IssueType = exports.IssueType || (exports.IssueType = {}));
 class Issue {
     constructor(content) {
         this.labels = content.labels;
         this.parameters = JSON.parse(core.getInput('parameters', { required: true }));
         this.similarity = +core.getInput('similarity', { required: false });
         this.bodyValue = +core.getInput('body-value', { required: false });
+        this.issueType = content.issueType;
         const globalAffixes = core.getInput('affixes', { required: false });
         if (globalAffixes) {
             this.globalAffixes = JSON.parse(globalAffixes);

@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import {IParameter, Issue, IIssueData} from './issue';
+import {IParameter, Issue, IIssueData, IssueType} from './issue';
 import {GithubApi} from './github';
 
 async function run() {
@@ -48,9 +48,13 @@ async function run() {
         github.setIssueLabels(issue.defaultArea.labels);
     }
   } else {
+    // eslint-disable-next-line prettier/prettier
+    if (winningAreaData.labels)
+      github.setIssueLabels(winningAreaData.labels);
     if (winningAreaData.assignees)
       github.setIssueAssignees(winningAreaData.assignees);
-    if (winningAreaData.labels) github.setIssueLabels(winningAreaData.labels);
+    if (winningAreaData.reviewers && issue.issueType === IssueType.PULL_REQUEST)
+      github.setReviewers(winningAreaData.reviewers);
     core.setOutput('labeled', true.toString());
     core.setOutput('assigned', true.toString());
   }

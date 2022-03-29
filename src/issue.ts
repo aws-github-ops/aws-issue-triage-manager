@@ -1,12 +1,19 @@
 /* eslint-disable no-control-regex */
 import * as core from '@actions/core';
 import levenshtein from 'js-levenshtein';
+import {IReviewers} from './github';
 
 export interface IIssueData {
   title?: string;
   body?: string;
   labels?: string[];
   isValidIssueType?: boolean;
+  issueType?: IssueType;
+}
+
+export enum IssueType {
+  ISSUE = 'issues',
+  PULL_REQUEST = 'pull-requests',
 }
 
 export interface IParameter extends IDefaultArea {
@@ -20,6 +27,7 @@ export interface IParameter extends IDefaultArea {
 export interface IDefaultArea {
   labels?: string[];
   assignees?: string[];
+  reviewers?: IReviewers;
 }
 
 export interface IAffix {
@@ -31,17 +39,19 @@ export class Issue {
   private titleIssueWords?: string[];
   private bodyIssueWords?: string[];
   public readonly parameters: IParameter[];
-  public defaultArea?: IDefaultArea;
+  public readonly defaultArea?: IDefaultArea;
   private similarity: number;
   private bodyValue: number;
   private labels: string[] | undefined;
   private globalAffixes?: IAffix;
+  public readonly issueType?: IssueType;
 
   constructor(content: IIssueData) {
     this.labels = content.labels;
     this.parameters = JSON.parse(core.getInput('parameters', {required: true}));
     this.similarity = +core.getInput('similarity', {required: false});
     this.bodyValue = +core.getInput('body-value', {required: false});
+    this.issueType = content.issueType;
 
     const globalAffixes = core.getInput('affixes', {required: false});
     if (globalAffixes) {
