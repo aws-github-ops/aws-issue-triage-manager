@@ -28186,6 +28186,9 @@ function run() {
                     github.setIssueAssignees(issue.defaultArea.assignees);
                 if (issue.defaultArea.labels)
                     github.setIssueLabels(issue.defaultArea.labels);
+                // eslint-disable-next-line prettier/prettier
+                if (winningAreaData.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
+                    github.setReviewers(winningAreaData.reviewers);
             }
         }
         else {
