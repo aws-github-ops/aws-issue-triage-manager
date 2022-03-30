@@ -1,6 +1,6 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import {IDefaultArea, IIssueData, IssueType} from './issue';
+import {IDefaultArea, IIssueData, Issue, IssueType} from './issue';
 
 export interface IRepo {
   owner: string;
@@ -30,10 +30,11 @@ export class GithubApi {
     }
   }
 
-  public async triage(area: IDefaultArea) {
+  public async triage(area: IDefaultArea, issue: Issue) {
+    // eslint-disable-next-line prettier/prettier
+    if (area.reviewers && issue.issueType === IssueType.PULL_REQUEST) this.setReviewers(area.reviewers);
     if (area.assignees) this.setIssueAssignees(area.assignees);
     if (area.labels) this.setIssueLabels(area.labels);
-    if (area.reviewers) this.setReviewers(area.reviewers);
   }
 
   public async setIssueAssignees(assignees: string[]) {

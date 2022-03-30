@@ -8468,14 +8468,15 @@ class GithubApi {
             core.setFailed('Error retrieving issue number');
         }
     }
-    triage(area) {
+    triage(area, issue) {
         return __awaiter(this, void 0, void 0, function* () {
+            // eslint-disable-next-line prettier/prettier
+            if (area.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
+                this.setReviewers(area.reviewers);
             if (area.assignees)
                 this.setIssueAssignees(area.assignees);
             if (area.labels)
                 this.setIssueLabels(area.labels);
-            if (area.reviewers)
-                this.setReviewers(area.reviewers);
         });
     }
     setIssueAssignees(assignees) {
@@ -8616,12 +8617,12 @@ function run() {
             core.info('Keywords not included in this issue');
             if (issue.defaultArea) {
                 core.info('Assigning default values to issue');
-                github.triage(issue.defaultArea);
+                github.triage(issue.defaultArea, issue);
             }
         }
         else {
             core.info('Assigning winning values to issue');
-            github.triage(winningAreaData);
+            github.triage(winningAreaData, issue);
         }
     });
 }

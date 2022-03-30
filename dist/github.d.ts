@@ -1,4 +1,4 @@
-import { IDefaultArea, IIssueData, IssueType } from './issue';
+import { IDefaultArea, IIssueData, Issue, IssueType } from './issue';
 export interface IRepo {
     owner: string;
     repo: string;
@@ -12,7 +12,7 @@ export declare class GithubApi {
     private repo;
     private issueNumber;
     constructor(token: string);
-    triage(area: IDefaultArea): Promise<void>;
+    triage(area: IDefaultArea, issue: Issue): Promise<void>;
     setIssueAssignees(assignees: string[]): Promise<void>;
     setIssueLabels(labels: string[]): Promise<void>;
     setReviewers(reviewers: IReviewers): Promise<void>;

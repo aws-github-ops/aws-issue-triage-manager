@@ -1,7 +1,7 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
 import {GithubApi} from '../github';
-import {IssueType} from '../issue';
+import {Issue, IssueType} from '../issue';
 
 // Shallow clone original @actions/github context
 const originalContext = {...github.context};
@@ -150,6 +150,7 @@ test("setIssueReviewers() requests GitHub's API, when provided a set of reviewer
 });
 
 test('triage() calls all setting methods', async () => {
+  process.env.INPUT_PARAMETERS = JSON.stringify([{}]);
   // Mock the @actions/github context.
   Object.defineProperty(github, 'context', {
     value: {
@@ -161,19 +162,23 @@ test('triage() calls all setting methods', async () => {
     },
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
+  const issue = new Issue({issueType: IssueType.PULL_REQUEST});
   // Mock the network request
   githubApi['octokit'].rest.pulls.requestReviewers = jest.fn();
   githubApi['octokit'].rest.issues.addLabels = jest.fn();
   githubApi['octokit'].rest.issues.addAssignees = jest.fn();
 
-  await githubApi.triage({
-    assignees: ['user1'],
-    labels: ['label1'],
-    reviewers: {
-      reviewers: ['user1'],
-      teamReviewers: ['team1'],
+  await githubApi.triage(
+    {
+      assignees: ['user1'],
+      labels: ['label1'],
+      reviewers: {
+        reviewers: ['user1'],
+        teamReviewers: ['team1'],
+      },
     },
-  });
+    issue
+  );
 
   expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledTimes(1);
   // eslint-disable-next-line prettier/prettier

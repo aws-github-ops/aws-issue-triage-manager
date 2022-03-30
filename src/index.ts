@@ -42,11 +42,11 @@ async function run() {
     core.info('Keywords not included in this issue');
     if (issue.defaultArea) {
       core.info('Assigning default values to issue');
-      github.triage(issue.defaultArea);
+      github.triage(issue.defaultArea, issue);
     }
   } else {
     core.info('Assigning winning values to issue');
-    github.triage(winningAreaData);
+    github.triage(winningAreaData, issue);
   }
 }
 
