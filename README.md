@@ -54,6 +54,10 @@ Parameters should take the form
     "keywords": ["keywords"],
     "labels": ["labels"],
     "assignees": ["assignees"],
+    "reviewers": {
+      "reviewers": ["reviewer1"],
+      "teamReviewers": ["team1"]
+    },
     "affixes": {
       "prefixes": ["prefix"],
       "suffixes": ["suffix"]
@@ -62,7 +66,8 @@ Parameters should take the form
 ]
 ```
 
-note: `labels`, `assignees`, and `affixes` are not required
+note: `labels`, `assignees`, `reviewers`, and `affixes` are not required
+note: `reviewers` naturally only takes effect on PRs
 
 ### affixes
 Affixes (prefixes and suffixes) to append or prepend to _all_ keywords
@@ -81,7 +86,11 @@ If no keywords are detected in your issue, set these default labels and assignee
 ```json
 {
   "labels": ["labels"],
-  "assignees": ["assignees"]
+  "assignees": ["assignees"],
+  "reviewers": {
+    "reviewers": ["reviewer1"],
+    "teamReviewers": ["team1"]
+  },
 }
 ```
 

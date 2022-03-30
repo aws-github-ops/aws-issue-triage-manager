@@ -1,10 +1,15 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import {IIssueData} from './issue';
+import {IIssueData, IssueType} from './issue';
 
 export interface IRepo {
   owner: string;
   repo: string;
+}
+
+export interface IReviewers {
+  reviewers: string[];
+  teamReviewers: string[];
 }
 
 export class GithubApi {
@@ -13,7 +18,7 @@ export class GithubApi {
   private issueNumber: number | undefined;
 
   constructor(token: string) {
-    this.octokit = new github.GitHub(token);
+    this.octokit = github.getOctokit(token);
     this.repo = github.context.repo;
 
     if (github.context.payload.issue) {
@@ -27,7 +32,7 @@ export class GithubApi {
 
   public async setIssueAssignees(assignees: string[]) {
     if (!assignees.length) return;
-    await this.octokit.issues.addAssignees({
+    await this.octokit.rest.issues.addAssignees({
       ...this.repo,
       issue_number: this.issueNumber,
       assignees,
@@ -36,20 +41,32 @@ export class GithubApi {
 
   public async setIssueLabels(labels: string[]) {
     if (!labels.length) return;
-    await this.octokit.issues.addLabels({
+    await this.octokit.rest.issues.addLabels({
       ...this.repo,
       issue_number: this.issueNumber,
       labels,
     });
   }
 
+  public async setReviewers(reviewers: IReviewers) {
+    if (!reviewers.reviewers.length && !reviewers.teamReviewers.length) return;
+    await this.octokit.rest.pulls.requestReviewers({
+      ...this.repo,
+      pull_number: this.issueNumber,
+      reviewers: reviewers.reviewers.length ? reviewers.reviewers : undefined,
+      // eslint-disable-next-line prettier/prettier
+      team_reviewers: reviewers.teamReviewers.length ? reviewers.teamReviewers : undefined,
+    });
+  }
+
   public async getIssueContent(): Promise<IIssueData> {
-    const {data} = await this.octokit.issues.get({
+    const {data} = await this.octokit.rest.issues.get({
       ...this.repo,
       issue_number: this.issueNumber,
     });
 
-    const isValidIssueType = this.verifyIssueType(data.pull_request);
+    const issueType = this.getIssueType(data.pull_request);
+    const isValidIssueType = this.verifyIssueType(data.pull_request, issueType);
 
     if (!isValidIssueType) return {isValidIssueType: false};
 
@@ -66,28 +83,26 @@ export class GithubApi {
       body,
       labels,
       isValidIssueType,
+      issueType,
     };
   }
 
-  public verifyIssueType(data): boolean {
+  public getIssueType(data): IssueType {
+    return data ? IssueType.PULL_REQUEST : IssueType.ISSUE;
+  }
+
+  public verifyIssueType(data, issueType): boolean {
     const target = core.getInput('target', {required: false});
 
-    if (target === 'both') {
+    // eslint-disable-next-line prettier/prettier
+    if (target === 'both')
       return true;
-    } else if (target === 'issues') {
-      if (!data) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (target === 'pull-requests') {
-      if (data) {
-        return true;
-      } else {
-        return false;
-      }
-    }
+    else if (target === IssueType.ISSUE && issueType === IssueType.ISSUE)
+      return true;
+    // eslint-disable-next-line prettier/prettier
+    else if (target === IssueType.PULL_REQUEST && issueType === IssueType.PULL_REQUEST)
+      return true;
 
-    return true;
+    return false;
   }
 }

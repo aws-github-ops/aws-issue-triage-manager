@@ -1,6 +1,7 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
 import {GithubApi} from '../github';
+import {IssueType} from '../issue';
 
 // Shallow clone original @actions/github context
 const originalContext = {...github.context};
@@ -81,12 +82,13 @@ test("setIssueAssignees() requests GitHub's API, when provided an array of assig
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.addAssignees = jest.fn();
+  githubApi['octokit'].rest.issues.addAssignees = jest.fn();
 
   await githubApi.setIssueAssignees(['test-assignee-1', 'test-assignee-2']);
 
-  expect(githubApi['octokit'].issues.addAssignees).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.addAssignees).toHaveBeenCalledWith({
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledWith({
     assignees: ['test-assignee-1', 'test-assignee-2'],
     issue_number: 54321,
   });
@@ -105,15 +107,46 @@ test("setIssueLabels() requests GitHub's API, when provided an array of labels",
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.addLabels = jest.fn();
+  githubApi['octokit'].rest.issues.addLabels = jest.fn();
 
   await githubApi.setIssueLabels(['needs-triage', 'aws-cognito']);
 
-  expect(githubApi['octokit'].issues.addLabels).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.addLabels).toHaveBeenCalledWith({
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledWith({
     issue_number: 54321,
     labels: ['needs-triage', 'aws-cognito'],
   });
+});
+
+test("setIssueLabels() requests GitHub's API, when provided a set of reviewers", async () => {
+  // Mock the @actions/github context.
+  Object.defineProperty(github, 'context', {
+    value: {
+      payload: {
+        pull_request: {
+          number: 54321,
+        },
+      },
+    },
+  });
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+  // Mock the network request
+  githubApi['octokit'].rest.pulls.requestReviewers = jest.fn();
+
+  await githubApi.setReviewers({
+    reviewers: ['user1'],
+    teamReviewers: ['team1'],
+  });
+
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledWith(
+    {
+      pull_number: 54321,
+      reviewers: ['user1'],
+      team_reviewers: ['team1'],
+    }
+  );
 });
 
 test("getIssueContent() requests GitHub's API, when issueNumber is set", async () => {
@@ -129,7 +162,7 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
   });
   const githubApi = new GithubApi('GITHUB_TOKEN');
   // Mock the network request
-  githubApi['octokit'].issues.get = jest.fn().mockReturnValue({
+  githubApi['octokit'].rest.issues.get = jest.fn().mockReturnValue({
     data: {
       title: 'test-title',
       body: 'test-body',
@@ -140,11 +173,12 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
       ],
     },
   });
+  process.env.INPUT_TARGET = 'both';
 
   const content = await githubApi.getIssueContent();
 
-  expect(githubApi['octokit'].issues.get).toHaveBeenCalledTimes(1);
-  expect(githubApi['octokit'].issues.get).toHaveBeenCalledWith({
+  expect(githubApi['octokit'].rest.issues.get).toHaveBeenCalledTimes(1);
+  expect(githubApi['octokit'].rest.issues.get).toHaveBeenCalledWith({
     issue_number: 54321,
   });
   expect(content).toStrictEqual({
@@ -152,6 +186,7 @@ test("getIssueContent() requests GitHub's API, when issueNumber is set", async (
     body: 'test-body',
     labels: ['needs-triage'],
     isValidIssueType: true,
+    issueType: 'issues',
   });
 });
 
@@ -160,10 +195,11 @@ test('VerifyIssueType returns true when target is both', async () => {
   const data = {
     pull_request: ['pullrequest'],
   };
+  const issueType = IssueType.ISSUE;
 
   const githubApi = new GithubApi('GITHUB_TOKEN');
 
-  expect(githubApi.verifyIssueType(data)).toStrictEqual(true);
+  expect(githubApi.verifyIssueType(data, issueType)).toStrictEqual(true);
 });
 
 test('VerifyIssueType returns correct value when target is issues', async () => {
@@ -172,11 +208,14 @@ test('VerifyIssueType returns correct value when target is issues', async () => 
     pull_request: ['pullrequest'],
   };
   const issueData = undefined;
+  const prIssueType = IssueType.PULL_REQUEST;
+  const issueIssueType = IssueType.ISSUE;
 
   const githubApi = new GithubApi('GITHUB_TOKEN');
 
-  expect(githubApi.verifyIssueType(prData)).toStrictEqual(false);
-  expect(githubApi.verifyIssueType(issueData)).toStrictEqual(true);
+  expect(githubApi.verifyIssueType(prData, prIssueType)).toStrictEqual(false);
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi.verifyIssueType(issueData, issueIssueType)).toStrictEqual(true);
 });
 
 test('VerifyIssueType returns correct value when target is pull-requests', async () => {
@@ -185,9 +224,12 @@ test('VerifyIssueType returns correct value when target is pull-requests', async
     pull_request: ['pullrequest'],
   };
   const issueData = undefined;
+  const prIssueType = IssueType.PULL_REQUEST;
+  const issueIssueType = IssueType.ISSUE;
 
   const githubApi = new GithubApi('GITHUB_TOKEN');
 
-  expect(githubApi.verifyIssueType(prData)).toStrictEqual(true);
-  expect(githubApi.verifyIssueType(issueData)).toStrictEqual(false);
+  expect(githubApi.verifyIssueType(prData, prIssueType)).toStrictEqual(true);
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi.verifyIssueType(issueData, issueIssueType)).toStrictEqual(false);
 });
