@@ -4,8 +4,8 @@ export interface IRepo {
     repo: string;
 }
 export interface IReviewers {
-    reviewers: string[];
-    teamReviewers: string[];
+    reviewers?: string[];
+    teamReviewers?: string[];
 }
 export declare class GithubApi {
     private octokit;

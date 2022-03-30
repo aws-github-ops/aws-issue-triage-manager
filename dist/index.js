@@ -8484,11 +8484,11 @@ class GithubApi {
     }
     setReviewers(reviewers) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!reviewers.reviewers.length && !reviewers.teamReviewers.length)
+            if (!reviewers.reviewers && !reviewers.teamReviewers)
                 return;
-            yield this.octokit.rest.pulls.requestReviewers(Object.assign(Object.assign({}, this.repo), { pull_number: this.issueNumber, reviewers: reviewers.reviewers.length ? reviewers.reviewers : undefined, 
+            yield this.octokit.rest.pulls.requestReviewers(Object.assign(Object.assign({}, this.repo), { pull_number: this.issueNumber, reviewers: reviewers.reviewers ? reviewers.reviewers : undefined, 
                 // eslint-disable-next-line prettier/prettier
-                team_reviewers: reviewers.teamReviewers.length ? reviewers.teamReviewers : undefined }));
+                team_reviewers: reviewers.teamReviewers ? reviewers.teamReviewers : undefined }));
         });
     }
     getIssueContent() {

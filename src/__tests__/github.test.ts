@@ -118,7 +118,7 @@ test("setIssueLabels() requests GitHub's API, when provided an array of labels",
   });
 });
 
-test("setIssueLabels() requests GitHub's API, when provided a set of reviewers", async () => {
+test("setIssueReviewers() requests GitHub's API, when provided a set of reviewers", async () => {
   // Mock the @actions/github context.
   Object.defineProperty(github, 'context', {
     value: {
