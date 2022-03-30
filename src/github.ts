@@ -1,6 +1,6 @@
 import * as github from '@actions/github';
 import * as core from '@actions/core';
-import {IIssueData, IssueType} from './issue';
+import {IDefaultArea, IIssueData, IssueType} from './issue';
 
 export interface IRepo {
   owner: string;
@@ -28,6 +28,12 @@ export class GithubApi {
     } else {
       core.setFailed('Error retrieving issue number');
     }
+  }
+
+  public async triage(area: IDefaultArea) {
+    if (area.assignees) this.setIssueAssignees(area.assignees);
+    if (area.labels) this.setIssueLabels(area.labels);
+    if (area.reviewers) this.setReviewers(area.reviewers);
   }
 
   public async setIssueAssignees(assignees: string[]) {

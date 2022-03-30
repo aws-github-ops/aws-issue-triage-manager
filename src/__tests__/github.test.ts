@@ -149,6 +149,67 @@ test("setIssueReviewers() requests GitHub's API, when provided a set of reviewer
   );
 });
 
+test('triage() calls all setting methods', async () => {
+  // Mock the @actions/github context.
+  Object.defineProperty(github, 'context', {
+    value: {
+      payload: {
+        pull_request: {
+          number: 54321,
+        },
+      },
+    },
+  });
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+  // Mock the network request
+  githubApi['octokit'].rest.pulls.requestReviewers = jest.fn();
+  githubApi['octokit'].rest.issues.addLabels = jest.fn();
+  githubApi['octokit'].rest.issues.addAssignees = jest.fn();
+
+  await githubApi.triage({
+    assignees: ['user1'],
+    labels: ['label1'],
+    reviewers: {
+      reviewers: ['user1'],
+      teamReviewers: ['team1'],
+    },
+  });
+
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledTimes(1);
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledTimes(1);
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledTimes(1);
+});
+
+test("set methods don't request GitHub's API when values to apply are null", async () => {
+  // Mock the @actions/github context.
+  Object.defineProperty(github, 'context', {
+    value: {
+      payload: {
+        pull_request: {
+          number: 54321,
+        },
+      },
+    },
+  });
+  const githubApi = new GithubApi('GITHUB_TOKEN');
+  // Mock the network request
+  githubApi['octokit'].rest.pulls.requestReviewers = jest.fn();
+  githubApi['octokit'].rest.issues.addLabels = jest.fn();
+  githubApi['octokit'].rest.issues.addAssignees = jest.fn();
+
+  await githubApi.setReviewers({});
+  await githubApi.setIssueAssignees([]);
+  await githubApi.setIssueLabels([]);
+
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.pulls.requestReviewers).toHaveBeenCalledTimes(0);
+  expect(githubApi['octokit'].rest.issues.addLabels).toHaveBeenCalledTimes(0);
+  // eslint-disable-next-line prettier/prettier
+  expect(githubApi['octokit'].rest.issues.addAssignees).toHaveBeenCalledTimes(0);
+});
+
 test("getIssueContent() requests GitHub's API, when issueNumber is set", async () => {
   // Mock the @actions/github context.
   Object.defineProperty(github, 'context', {

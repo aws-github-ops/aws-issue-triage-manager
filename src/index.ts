@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import {IParameter, Issue, IIssueData, IssueType} from './issue';
+import {IParameter, Issue, IIssueData} from './issue';
 import {GithubApi} from './github';
 
 async function run() {
@@ -42,24 +42,11 @@ async function run() {
     core.info('Keywords not included in this issue');
     if (issue.defaultArea) {
       core.info('Assigning default values to issue');
-      if (issue.defaultArea.assignees)
-        github.setIssueAssignees(issue.defaultArea.assignees);
-      if (issue.defaultArea.labels)
-        github.setIssueLabels(issue.defaultArea.labels);
-      // eslint-disable-next-line prettier/prettier
-      if (issue.defaultArea.reviewers && issue.issueType === IssueType.PULL_REQUEST)
-        github.setReviewers(issue.defaultArea.reviewers);
+      github.triage(issue.defaultArea);
     }
   } else {
-    // eslint-disable-next-line prettier/prettier
-    if (winningAreaData.labels)
-      github.setIssueLabels(winningAreaData.labels);
-    if (winningAreaData.assignees)
-      github.setIssueAssignees(winningAreaData.assignees);
-    if (winningAreaData.reviewers && issue.issueType === IssueType.PULL_REQUEST)
-      github.setReviewers(winningAreaData.reviewers);
-    core.setOutput('labeled', true.toString());
-    core.setOutput('assigned', true.toString());
+    core.info('Assigning winning values to issue');
+    github.triage(winningAreaData);
   }
 }
 

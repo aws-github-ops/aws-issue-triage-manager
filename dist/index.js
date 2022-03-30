@@ -8468,6 +8468,16 @@ class GithubApi {
             core.setFailed('Error retrieving issue number');
         }
     }
+    triage(area) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (area.assignees)
+                this.setIssueAssignees(area.assignees);
+            if (area.labels)
+                this.setIssueLabels(area.labels);
+            if (area.reviewers)
+                this.setReviewers(area.reviewers);
+        });
+    }
     setIssueAssignees(assignees) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!assignees.length)
@@ -8606,25 +8616,12 @@ function run() {
             core.info('Keywords not included in this issue');
             if (issue.defaultArea) {
                 core.info('Assigning default values to issue');
-                if (issue.defaultArea.assignees)
-                    github.setIssueAssignees(issue.defaultArea.assignees);
-                if (issue.defaultArea.labels)
-                    github.setIssueLabels(issue.defaultArea.labels);
-                // eslint-disable-next-line prettier/prettier
-                if (issue.defaultArea.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
-                    github.setReviewers(issue.defaultArea.reviewers);
+                github.triage(issue.defaultArea);
             }
         }
         else {
-            // eslint-disable-next-line prettier/prettier
-            if (winningAreaData.labels)
-                github.setIssueLabels(winningAreaData.labels);
-            if (winningAreaData.assignees)
-                github.setIssueAssignees(winningAreaData.assignees);
-            if (winningAreaData.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
-                github.setReviewers(winningAreaData.reviewers);
-            core.setOutput('labeled', true.toString());
-            core.setOutput('assigned', true.toString());
+            core.info('Assigning winning values to issue');
+            github.triage(winningAreaData);
         }
     });
 }
