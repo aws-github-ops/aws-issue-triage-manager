@@ -8468,6 +8468,17 @@ class GithubApi {
             core.setFailed('Error retrieving issue number');
         }
     }
+    triage(area, issue) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // eslint-disable-next-line prettier/prettier
+            if (area.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
+                this.setReviewers(area.reviewers);
+            if (area.assignees)
+                this.setIssueAssignees(area.assignees);
+            if (area.labels)
+                this.setIssueLabels(area.labels);
+        });
+    }
     setIssueAssignees(assignees) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!assignees.length)
@@ -8484,11 +8495,11 @@ class GithubApi {
     }
     setReviewers(reviewers) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!reviewers.reviewers.length && !reviewers.teamReviewers.length)
+            if (!reviewers.reviewers && !reviewers.teamReviewers)
                 return;
-            yield this.octokit.rest.pulls.requestReviewers(Object.assign(Object.assign({}, this.repo), { pull_number: this.issueNumber, reviewers: reviewers.reviewers.length ? reviewers.reviewers : undefined, 
+            yield this.octokit.rest.pulls.requestReviewers(Object.assign(Object.assign({}, this.repo), { pull_number: this.issueNumber, reviewers: reviewers.reviewers ? reviewers.reviewers : undefined, 
                 // eslint-disable-next-line prettier/prettier
-                team_reviewers: reviewers.teamReviewers.length ? reviewers.teamReviewers : undefined }));
+                team_reviewers: reviewers.teamReviewers ? reviewers.teamReviewers : undefined }));
         });
     }
     getIssueContent() {
@@ -8606,25 +8617,12 @@ function run() {
             core.info('Keywords not included in this issue');
             if (issue.defaultArea) {
                 core.info('Assigning default values to issue');
-                if (issue.defaultArea.assignees)
-                    github.setIssueAssignees(issue.defaultArea.assignees);
-                if (issue.defaultArea.labels)
-                    github.setIssueLabels(issue.defaultArea.labels);
-                // eslint-disable-next-line prettier/prettier
-                if (issue.defaultArea.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
-                    github.setReviewers(issue.defaultArea.reviewers);
+                github.triage(issue.defaultArea, issue);
             }
         }
         else {
-            // eslint-disable-next-line prettier/prettier
-            if (winningAreaData.labels)
-                github.setIssueLabels(winningAreaData.labels);
-            if (winningAreaData.assignees)
-                github.setIssueAssignees(winningAreaData.assignees);
-            if (winningAreaData.reviewers && issue.issueType === issue_1.IssueType.PULL_REQUEST)
-                github.setReviewers(winningAreaData.reviewers);
-            core.setOutput('labeled', true.toString());
-            core.setOutput('assigned', true.toString());
+            core.info('Assigning winning values to issue');
+            github.triage(winningAreaData, issue);
         }
     });
 }
