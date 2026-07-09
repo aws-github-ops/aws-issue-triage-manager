@@ -49,7 +49,7 @@ outputs:
   assigned:
     description: "\"true\" if assigned otherwise \"false\""
 runs:
-  using: "node12"
+  using: "node24"
   main: "dist/index.js"
 branding:
   icon: alert-circle
